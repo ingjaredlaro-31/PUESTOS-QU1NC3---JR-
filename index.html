@@ -437,6 +437,72 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 }
 .helptext{font-size:11.5px;color:var(--text-muted);margin-top:8px;line-height:1.55;}
 
+/* ===== MARCADOR EN VIVO ===== */
+.marcador-toolbar{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+  margin:0 34px 18px;
+}
+.marcador-toolbar-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.marcador-toolbar select{
+  padding:9px 12px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:4px;
+  color:var(--text);font-size:12.5px;max-width:320px;
+}
+.marcador-stage{
+  margin:0 34px 34px;border-radius:14px;overflow:hidden;border:1px solid var(--border);
+  background:radial-gradient(circle at 50% 30%, rgba(255,255,255,.03), transparent 60%), #0A0B0D;
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
+}
+.marcador-header{
+  text-align:center;padding:22px 20px 10px;font-family:var(--mono);
+  color:var(--text-muted);letter-spacing:.2em;text-transform:uppercase;font-size:13px;
+}
+.marcador-header b{color:var(--cream);font-family:var(--display);font-weight:600;font-size:22px;letter-spacing:.02em;display:block;margin-top:4px;}
+.marcador-versus{display:flex;align-items:stretch;min-height:360px;}
+.marcador-lado{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px;position:relative;}
+.marcador-lado.r{background:linear-gradient(160deg, rgba(216,52,42,.22), rgba(216,52,42,.05));}
+.marcador-lado.v{background:linear-gradient(200deg, rgba(46,158,82,.22), rgba(46,158,82,.05));}
+.marcador-lado-tag{font-family:var(--mono);font-size:15px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:14px;}
+.marcador-lado.r .marcador-lado-tag{color:var(--rojo);}
+.marcador-lado.v .marcador-lado-tag{color:var(--verde);}
+.marcador-partido{font-family:var(--display);font-weight:600;font-size:clamp(32px,5vw,60px);color:var(--cream);line-height:1;text-align:center;letter-spacing:.01em;}
+.marcador-rep{font-size:14px;color:var(--text-muted);margin-top:8px;}
+.marcador-gallo{margin-top:20px;font-size:16px;color:var(--text);text-align:center;}
+.marcador-gallo b{color:var(--cream);}
+.marcador-center{
+  width:200px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;background:#000;position:relative;
+}
+.marcador-vs{font-family:var(--display);font-weight:600;font-size:24px;color:var(--text-dim);margin-bottom:18px;}
+.marcador-timer{font-family:var(--mono);font-size:clamp(30px,4vw,44px);color:var(--cream);font-weight:700;letter-spacing:.05em;}
+.marcador-timer-controls{display:flex;gap:6px;margin-top:14px;}
+.marcador-timer-controls button{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--bg-panel-2);
+  color:var(--text);cursor:pointer;font-size:13px;
+}
+.marcador-timer-controls button:hover{border-color:var(--gold-soft);color:var(--gold);}
+.marcador-ganador-row{display:flex;gap:1px;background:var(--border);}
+.marcador-ganador-row button{
+  flex:1;border:none;padding:20px;font-family:var(--display);font-weight:600;font-size:20px;letter-spacing:.05em;
+  text-transform:uppercase;cursor:pointer;color:var(--cream);transition:filter .12s ease;
+}
+.marcador-ganador-row button:hover{filter:brightness(1.2);}
+.marcador-ganador-row .mg-r{background:var(--rojo-dark);}
+.marcador-ganador-row .mg-t{background:#3A3A3A;color:var(--text-muted);}
+.marcador-ganador-row .mg-v{background:var(--verde-dark);}
+.marcador-resultado-banner{
+  text-align:center;padding:16px;font-family:var(--display);font-weight:600;font-size:26px;letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.marcador-resultado-banner.r{background:var(--rojo);color:#1a0806;}
+.marcador-resultado-banner.v{background:var(--verde);color:#06170c;}
+.marcador-resultado-banner.t{background:var(--tabla);color:#1a1608;}
+@media (max-width:900px){
+  .marcador-versus{flex-direction:column;}
+  .marcador-center{width:100%;padding:16px;flex-direction:row;justify-content:center;gap:20px;}
+  .marcador-timer-controls{margin-top:0;}
+  .marcador-toolbar,.marcador-stage{margin-left:16px;margin-right:16px;}
+}
+
 @media print{
   .sidebar,.topbar,.panel-actions,.no-print{display:none !important;}
   body{background:#fff;color:#000;}
@@ -657,6 +723,19 @@ tr:hover td{background:rgba(212,175,93,0.035);}
             <div class="ticket-grid" id="ticketGrid"></div>
           </div>
         </div>
+      </section>
+
+      <!-- MARCADOR EN VIVO -->
+      <section class="view-section" id="view-marcador">
+        <div class="marcador-toolbar no-print">
+          <div class="marcador-toolbar-left">
+            <button class="btn btn-ghost btn-sm" onclick="marcadorAnterior()">◀ Anterior</button>
+            <select id="marcadorSelect" onchange="marcadorSeleccionar(this.value)"></select>
+            <button class="btn btn-ghost btn-sm" onclick="marcadorSiguiente()">Siguiente ▶</button>
+          </div>
+          <button class="btn btn-gold btn-sm" onclick="marcadorPantallaCompleta()">⛶ Pantalla completa</button>
+        </div>
+        <div id="marcadorWrap"></div>
       </section>
 
       <!-- RESULTADOS -->
@@ -1168,6 +1247,7 @@ const NAV_ITEMS = [
   {id:'dashboard', label:'Panel', icon:'◆', roles:['admin','juez']},
   {id:'gallos', label:'Partidos', icon:'▤', roles:['admin','juez']},
   {id:'cotejar', label:'Cotejador', icon:'⚔', roles:['admin','juez']},
+  {id:'marcador', label:'Marcador en Vivo', icon:'▣', roles:['admin','juez']},
   {id:'resultados', label:'Resultados', icon:'✓', roles:['admin','juez']},
   {id:'posiciones', label:'Posiciones', icon:'♛', roles:['admin','juez']},
   {id:'derbys', label:'Derbys', icon:'❖', roles:['admin','juez']},
@@ -1179,6 +1259,7 @@ const TITLES = {
   dashboard:['Panel','Resumen general del Derby'],
   gallos:['Partidos','Partidos inscritos y sus gallos'],
   cotejar:['Cotejador','Derby · Rápidas · Compromiso'],
+  marcador:['Marcador en Vivo','Pantalla para conectar a TV o proyector'],
   resultados:['Resultados','Captura de ganadores por combate'],
   posiciones:['Posiciones','Tabla del derby por partido'],
   derbys:['Derbys','Partidos inscritos y gallos, a detalle'],
@@ -1938,6 +2019,146 @@ function imprimirRolCombates(derbyId){
   w.document.close(); w.print();
 }
 
+/* ===================== MARCADOR EN VIVO ===================== */
+let marcadorPeleaId = null;
+let marcadorSegundos = 0;
+let marcadorInterval = null;
+let marcadorCorriendo = false;
+
+function marcadorListaPeleas(){
+  // pendientes primero (en orden), luego las ya cerradas al final (por si se quiere revisar)
+  const pendientes = DB.peleas.filter(c=>c.estado==='pendiente');
+  const cerradas = DB.peleas.filter(c=>c.estado==='finalizado');
+  return [...pendientes, ...cerradas];
+}
+function renderMarcadorSelect(){
+  const sel = document.getElementById('marcadorSelect');
+  if(!sel) return;
+  const lista = marcadorListaPeleas();
+  if(!lista.length){ sel.innerHTML = '<option value="">— sin combates armados —</option>'; return; }
+  if(!marcadorPeleaId || !lista.some(c=>c.id===marcadorPeleaId)) marcadorPeleaId = lista[0].id;
+  sel.innerHTML = lista.map(c=>{
+    const a=gallo(c.rojo), b=gallo(c.verde);
+    const etiqueta = a&&b ? `#${String(c.numero).padStart(3,'0')} · ${MODALIDAD_LABEL[c.tipo]} · ${a.partido} vs ${b.partido}${c.estado==='finalizado'?' (cerrado)':''}` : `#${c.numero}`;
+    return `<option value="${c.id}" ${c.id===marcadorPeleaId?'selected':''}>${etiqueta}</option>`;
+  }).join('');
+}
+function marcadorSeleccionar(id){
+  marcadorPeleaId = parseInt(id);
+  marcadorReiniciar();
+  renderMarcador();
+}
+function marcadorAnterior(){
+  const lista = marcadorListaPeleas();
+  const i = lista.findIndex(c=>c.id===marcadorPeleaId);
+  if(i>0){ marcadorPeleaId = lista[i-1].id; marcadorReiniciar(); renderMarcador(); }
+}
+function marcadorSiguiente(){
+  const lista = marcadorListaPeleas();
+  const i = lista.findIndex(c=>c.id===marcadorPeleaId);
+  if(i>=0 && i<lista.length-1){ marcadorPeleaId = lista[i+1].id; marcadorReiniciar(); renderMarcador(); }
+}
+function marcadorFormatoTiempo(){
+  const m = String(Math.floor(marcadorSegundos/60)).padStart(2,'0');
+  const s = String(marcadorSegundos%60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+function marcadorTick(){
+  marcadorSegundos++;
+  const el = document.getElementById('marcadorTimerDisplay');
+  if(el) el.textContent = marcadorFormatoTiempo();
+}
+function marcadorIniciar(){
+  if(marcadorCorriendo) return;
+  marcadorCorriendo = true;
+  marcadorInterval = setInterval(marcadorTick, 1000);
+}
+function marcadorPausar(){
+  marcadorCorriendo = false;
+  clearInterval(marcadorInterval);
+}
+function marcadorReiniciar(){
+  marcadorPausar();
+  marcadorSegundos = 0;
+  const el = document.getElementById('marcadorTimerDisplay');
+  if(el) el.textContent = marcadorFormatoTiempo();
+}
+function marcadorMarcarGanador(lado){
+  const c = DB.peleas.find(x=>x.id===marcadorPeleaId);
+  if(!c) return;
+  c.resultado = lado;
+  c.estado = 'finalizado';
+  [c.rojo,c.verde].forEach(gid=>{ const g=gallo(gid); if(g) g.estado='peleado'; });
+  saveDB();
+  marcadorPausar();
+  toast('Resultado guardado');
+  renderAll();
+}
+function marcadorPantallaCompleta(){
+  const el = document.getElementById('marcadorWrap');
+  if(!el) return;
+  if(el.requestFullscreen) el.requestFullscreen();
+  else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+}
+function renderMarcador(){
+  renderMarcadorSelect();
+  const wrap = document.getElementById('marcadorWrap');
+  if(!wrap) return;
+  const lista = marcadorListaPeleas();
+  if(!lista.length){
+    wrap.innerHTML = emptyState('Sin combates armados','Corre el Cotejador (Derby, Rápidas o Compromiso) para tener peleas que mostrar aquí.');
+    return;
+  }
+  if(!marcadorPeleaId || !lista.some(c=>c.id===marcadorPeleaId)) marcadorPeleaId = lista[0].id;
+  const c = DB.peleas.find(x=>x.id===marcadorPeleaId);
+  const a = gallo(c.rojo), b = gallo(c.verde);
+  if(!a||!b){ wrap.innerHTML = emptyState('Combate no disponible','Uno de los gallos de este combate ya no existe.'); return; }
+  const cerrado = c.estado==='finalizado';
+  let banner = '';
+  if(cerrado){
+    if(c.resultado==='rojo') banner = `<div class="marcador-resultado-banner r">🏆 Ganó Lado Rojo — ${a.partido}</div>`;
+    else if(c.resultado==='verde') banner = `<div class="marcador-resultado-banner v">🏆 Ganó Lado Verde — ${b.partido}</div>`;
+    else banner = `<div class="marcador-resultado-banner t">🤝 Tabla</div>`;
+  }
+  wrap.innerHTML = `
+    <div class="marcador-stage" id="marcadorStage">
+      ${banner}
+      <div class="marcador-header">
+        Frente Nº ${String(c.numero).padStart(3,'0')} · ${MODALIDAD_LABEL[c.tipo]}${c.ronda?' · Ronda '+c.ronda:''}
+        <b>${DB.torneo.nombre||''}</b>
+      </div>
+      <div class="marcador-versus">
+        <div class="marcador-lado r">
+          <div class="marcador-lado-tag">Lado Rojo</div>
+          <div class="marcador-partido">${a.partido}</div>
+          <div class="marcador-rep">Rep. ${a.dueno}</div>
+          <div class="marcador-gallo"><b>${a.nombre}</b> — ${a.peso.toFixed(2)}kg${a.anillo?' · #'+a.anillo:''}${a.color?' · '+a.color:''}</div>
+        </div>
+        <div class="marcador-center">
+          <div class="marcador-vs">VS</div>
+          <div class="marcador-timer" id="marcadorTimerDisplay">${marcadorFormatoTiempo()}</div>
+          <div class="marcador-timer-controls no-print">
+            <button onclick="marcadorIniciar()" title="Iniciar">▶</button>
+            <button onclick="marcadorPausar()" title="Pausar">❚❚</button>
+            <button onclick="marcadorReiniciar()" title="Reiniciar">↺</button>
+          </div>
+        </div>
+        <div class="marcador-lado v">
+          <div class="marcador-lado-tag">Lado Verde</div>
+          <div class="marcador-partido">${b.partido}</div>
+          <div class="marcador-rep">Rep. ${b.dueno}</div>
+          <div class="marcador-gallo"><b>${b.nombre}</b> — ${b.peso.toFixed(2)}kg${b.anillo?' · #'+b.anillo:''}${b.color?' · '+b.color:''}</div>
+        </div>
+      </div>
+      <div class="marcador-ganador-row no-print">
+        <button class="mg-r" onclick="marcadorMarcarGanador('rojo')">Ganó Rojo</button>
+        <button class="mg-t" onclick="marcadorMarcarGanador('tabla')">Tabla</button>
+        <button class="mg-v" onclick="marcadorMarcarGanador('verde')">Ganó Verde</button>
+      </div>
+    </div>
+  `;
+}
+
 /* ===================== RESULTADOS ===================== */
 function abrirModalResultado(id){
   resultadoTarget = id;
@@ -2210,6 +2431,7 @@ function renderAll(){
   populatePartidosDatalist();
   renderDerbysPage();
   renderPalenquesAdmin();
+  renderMarcador();
   if(activeTab==='compromiso') fillCompromisoSelects();
 }
 
