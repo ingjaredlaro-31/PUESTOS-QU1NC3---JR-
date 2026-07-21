@@ -372,7 +372,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 .fc-swap{position:absolute;top:14px;right:16px;}
 
 /* ===== POSICIONES / STANDINGS ===== */
-.standings-row{display:grid;grid-template-columns:44px 1fr 70px 70px 70px 80px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--border-soft);}
+.standings-row{display:grid;grid-template-columns:44px 1fr 70px 70px 70px 80px 44px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--border-soft);}
 .standings-row.head{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
 .rank-badge{
   width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -496,6 +496,34 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 .marcador-resultado-banner.r{background:var(--rojo);color:#1a0806;}
 .marcador-resultado-banner.v{background:var(--verde);color:#06170c;}
 .marcador-resultado-banner.t{background:var(--tabla);color:#1a1608;}
+.marcador-siguiente{
+  border-top:2px solid var(--gold);background:#000;
+  padding:16px 28px;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:wrap;
+}
+.marcador-siguiente-tag{
+  font-family:var(--mono);font-size:13px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:8px;
+}
+.marcador-siguiente-tag::before{content:"▶";}
+.marcador-siguiente-nombres{
+  font-family:var(--display);font-weight:600;font-size:clamp(18px,2.4vw,28px);letter-spacing:.02em;
+  display:flex;align-items:center;gap:14px;
+}
+.marcador-siguiente-nombres .r{color:var(--rojo);}
+.marcador-siguiente-nombres .vsdot{color:var(--text-dim);font-size:15px;}
+.marcador-siguiente-nombres .v{color:var(--verde);}
+.marcador-siguiente-prep{
+  font-family:var(--mono);font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--cream);
+  background:var(--rojo-dark);padding:6px 14px;border-radius:20px;animation:marcadorPulso 1.6s ease-in-out infinite;
+}
+@keyframes marcadorPulso{0%,100%{opacity:1;}50%{opacity:.55;}}
+.marcador-aviso{
+  border:1px solid var(--gold-dim);border-radius:10px;background:var(--bg-panel);
+  padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.marcador-aviso-txt{font-size:13.5px;color:var(--text);}
+.marcador-aviso-txt b{color:var(--gold);font-family:var(--mono);letter-spacing:.05em;}
+.marcador-aviso-btns{display:flex;gap:8px;flex-wrap:wrap;}
 @media (max-width:900px){
   .marcador-versus{flex-direction:column;}
   .marcador-center{width:100%;padding:16px;flex-direction:row;justify-content:center;gap:20px;}
@@ -515,7 +543,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
   .topbar{padding:14px 16px;}
   #menuToggle{display:inline-flex;}
   .hero-title{font-size:32px;}
-  .standings-row{grid-template-columns:34px 1fr 50px 50px;font-size:12px;}
+  .standings-row{grid-template-columns:34px 1fr 50px 50px 36px;font-size:12px;}
   .standings-row span.hide-mobile{display:none;}
 }
 #menuToggle{display:none;background:none;border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:4px;cursor:pointer;}
@@ -612,10 +640,11 @@ tr:hover td{background:rgba(212,175,93,0.035);}
           <div class="panel-head"><div><span class="panel-eyebrow">Inscripción</span><h2>Inscribir partido</h2></div></div>
           <div class="panel-body">
             <p class="helptext" style="margin-bottom:14px;">Elige a qué derby pertenece el partido. Si no ves el derby que buscas, créalo primero en Configuración.</p>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr 1fr auto;align-items:end;">
               <div class="field"><label>Derby</label><select id="pgDerbySelect"></select></div>
               <div class="field"><label>Nombre del partido</label><input id="pgNombre" placeholder="Ej. Gallera El Progreso"></div>
               <div class="field"><label>Representante</label><input id="pgRepresentante" placeholder="Nombre del representante"></div>
+              <div class="field"><label>WhatsApp</label><input id="pgTelefono" placeholder="Ej. 9181234567"></div>
               <button class="btn btn-primary" onclick="inscribirPartidoGeneral()">+ Inscribir partido</button>
             </div>
           </div>
@@ -656,6 +685,32 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 
       </section>
 
+      <!-- CASTEO DE POLLOS -->
+      <section class="view-section" id="view-casteo">
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Registro previo al derby</span><h2>Inscribir partido de casteo</h2></div></div>
+          <div class="panel-body">
+            <p class="helptext" style="margin-bottom:14px;">El casteo es aparte del derby: aquí nomás se registran y anillan los pollos, meses antes de que peleen. Cuando ya arme el derby de verdad, puede verificar cada gallo contra lo que anotó aquí.</p>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+              <div class="field"><label>Nombre del partido</label><input id="ctNombre" placeholder="Ej. Gallera El Progreso"></div>
+              <div class="field"><label>Representante</label><input id="ctRepresentante" placeholder="Nombre del representante"></div>
+              <div class="field"><label>Fecha del casteo</label><input id="ctFecha" type="date"></div>
+              <button class="btn btn-primary" onclick="inscribirPartidoCasteo()">+ Inscribir partido</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><span class="panel-eyebrow">Pollos anillados</span><h2>Partidos del casteo</h2></div>
+            <div class="panel-actions"><button class="btn btn-gold" onclick="imprimirHojaCasteoCompleta()">🖶 Imprimir todo el casteo</button></div>
+          </div>
+          <div class="panel-body">
+            <p class="helptext" style="margin-bottom:14px;">Cada tarjeta es un partido de casteo. Dale de alta sus pollos ahí mismo (anillo, color, casta) — pueden ser 15 o los que sean.</p>
+            <div id="casteoPartidosWrap"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- COTEJADOR (3 modalidades) -->
       <section class="view-section" id="view-cotejar">
         <div class="panel">
@@ -672,9 +727,10 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 
               <div style="border:1px solid var(--border);border-radius:5px;padding:18px;margin-bottom:18px;background:var(--bg-panel-3);">
                 <div class="panel-eyebrow" style="margin-bottom:10px;">Inscribir partido</div>
-                <div class="form-grid" style="grid-template-columns:1fr 1fr auto;align-items:end;">
+                <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
                   <div class="field"><label>Nombre del partido</label><input id="pNombre" placeholder="Ej. Gallera El Progreso"></div>
                   <div class="field"><label>Representante</label><input id="pRepresentante" placeholder="Nombre del representante"></div>
+                  <div class="field"><label>WhatsApp</label><input id="pTelefono" placeholder="Ej. 9181234567"></div>
                   <button class="btn btn-primary" onclick="inscribirPartido()">+ Inscribir partido</button>
                 </div>
               </div>
@@ -736,6 +792,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
           <button class="btn btn-gold btn-sm" onclick="marcadorPantallaCompleta()">⛶ Pantalla completa</button>
         </div>
         <div id="marcadorWrap"></div>
+        <div id="marcadorAvisosWrap" class="no-print" style="margin:0 34px 34px;"></div>
       </section>
 
       <!-- RESULTADOS -->
@@ -940,10 +997,44 @@ tr:hover td{background:rgba(212,175,93,0.035);}
     <div class="modal-body">
       <div class="field"><label>Nombre del partido</label><input id="epNombre"></div>
       <div class="field"><label>Representante</label><input id="epRepresentante"></div>
+      <div class="field"><label>WhatsApp</label><input id="epTelefono" placeholder="Ej. 9181234567"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="cerrarModalEditarPartido()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardarEdicionPartido()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR PARTIDO DE CASTEO -->
+<div class="modal-overlay" id="modalEditarPartidoCasteo">
+  <div class="modal">
+    <div class="modal-head"><h3>Editar partido de casteo</h3><button class="modal-close" onclick="cerrarModalEditarPartidoCasteo()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre del partido</label><input id="ecNombre"></div>
+      <div class="field"><label>Representante</label><input id="ecRepresentante"></div>
+      <div class="field"><label>Fecha del casteo</label><input id="ecFecha" type="date"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="cerrarModalEditarPartidoCasteo()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEdicionPartidoCasteo()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR POLLO -->
+<div class="modal-overlay" id="modalEditarPollo">
+  <div class="modal">
+    <div class="modal-head"><h3>Editar pollo</h3><button class="modal-close" onclick="cerrarModalEditarPollo()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Apodo (opcional)</label><input id="epoNombre"></div>
+      <div class="field"><label>Anillo</label><input id="epoAnillo"></div>
+      <div class="field"><label>Color</label><input id="epoColor"></div>
+      <div class="field"><label>Casta</label><input id="epoCasta"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="cerrarModalEditarPollo()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEdicionPollo()">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -1179,11 +1270,15 @@ function defaultDB(){
     partidos:[],
     derbys:[],
     derbyActivoId:null,
+    casteoPartidos:[],
+    pollos:[],
     nextId:1
   };
 }
 function normalizarDB(){
   if(!DB.usuarios || !DB.usuarios.length) DB.usuarios = defaultDB().usuarios;
+  if(!DB.casteoPartidos) DB.casteoPartidos = [];
+  if(!DB.pollos) DB.pollos = [];
   if(!DB.peleas) DB.peleas = [];
   if(!DB.partidos) DB.partidos = [];
   if(!DB.derbys){
@@ -1246,6 +1341,7 @@ function doLogout(){
 const NAV_ITEMS = [
   {id:'dashboard', label:'Panel', icon:'◆', roles:['admin','juez']},
   {id:'gallos', label:'Partidos', icon:'▤', roles:['admin','juez']},
+  {id:'casteo', label:'Casteo de Pollos', icon:'⬡', roles:['admin','juez']},
   {id:'cotejar', label:'Cotejador', icon:'⚔', roles:['admin','juez']},
   {id:'marcador', label:'Marcador en Vivo', icon:'▣', roles:['admin','juez']},
   {id:'resultados', label:'Resultados', icon:'✓', roles:['admin','juez']},
@@ -1258,6 +1354,7 @@ const NAV_ITEMS = [
 const TITLES = {
   dashboard:['Panel','Resumen general del Derby'],
   gallos:['Partidos','Partidos inscritos y sus gallos'],
+  casteo:['Casteo de Pollos','Registro y anillado, antes del derby'],
   cotejar:['Cotejador','Derby · Rápidas · Compromiso'],
   marcador:['Marcador en Vivo','Pantalla para conectar a TV o proyector'],
   resultados:['Resultados','Captura de ganadores por combate'],
@@ -1577,12 +1674,13 @@ function cerrarModalDetallePartido(){ document.getElementById('modalDetalleParti
 function inscribirPartido(){
   const nombre = document.getElementById('pNombre').value.trim();
   const representante = document.getElementById('pRepresentante').value.trim();
+  const telefono = document.getElementById('pTelefono').value.trim();
   if(!DB.derbyActivoId){ toast('Primero crea y activa un derby en Configuración'); return; }
   if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
   if(DB.partidos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase() && p.derbyId===DB.derbyActivoId)){ toast('Ese partido ya está inscrito en este derby'); return; }
-  DB.partidos.push({id:newId(), nombre, representante, derbyId:DB.derbyActivoId});
+  DB.partidos.push({id:newId(), nombre, representante, telefono, derbyId:DB.derbyActivoId});
   saveDB();
-  document.getElementById('pNombre').value=''; document.getElementById('pRepresentante').value='';
+  document.getElementById('pNombre').value=''; document.getElementById('pRepresentante').value=''; document.getElementById('pTelefono').value='';
   toast('Partido inscrito');
   renderAll();
 }
@@ -1597,14 +1695,220 @@ function inscribirPartidoGeneral(){
   const derbyId = parseInt(document.getElementById('pgDerbySelect').value);
   const nombre = document.getElementById('pgNombre').value.trim();
   const representante = document.getElementById('pgRepresentante').value.trim();
+  const telefono = document.getElementById('pgTelefono').value.trim();
   if(!derbyId){ toast('Primero crea un derby en Configuración'); return; }
   if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
   if(DB.partidos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase() && p.derbyId===derbyId)){ toast('Ese partido ya está inscrito en ese derby'); return; }
-  DB.partidos.push({id:newId(), nombre, representante, derbyId});
+  DB.partidos.push({id:newId(), nombre, representante, telefono, derbyId});
   saveDB();
-  document.getElementById('pgNombre').value=''; document.getElementById('pgRepresentante').value='';
+  document.getElementById('pgNombre').value=''; document.getElementById('pgRepresentante').value=''; document.getElementById('pgTelefono').value='';
   toast('Partido inscrito');
   renderAll();
+}
+
+/* ===================== CASTEO DE POLLOS ===================== */
+function inscribirPartidoCasteo(){
+  const nombre = document.getElementById('ctNombre').value.trim();
+  const representante = document.getElementById('ctRepresentante').value.trim();
+  const fecha = document.getElementById('ctFecha').value;
+  if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
+  if(DB.casteoPartidos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase())){ toast('Ese partido ya está inscrito en el casteo'); return; }
+  DB.casteoPartidos.push({id:newId(), nombre, representante, fecha});
+  saveDB();
+  document.getElementById('ctNombre').value=''; document.getElementById('ctRepresentante').value='';
+  toast('Partido de casteo inscrito');
+  renderAll();
+}
+function borrarPartidoCasteo(id){
+  confirmarAccion('¿Quitar este partido del casteo? También se borran sus pollos registrados.', ()=>{
+    DB.casteoPartidos = DB.casteoPartidos.filter(p=>p.id!==id);
+    DB.pollos = DB.pollos.filter(g=>g.partidoCasteoId!==id);
+    saveDB(); renderAll();
+    toast('Partido de casteo eliminado');
+  });
+}
+let editPartidoCasteoTarget = null;
+function abrirEditarPartidoCasteo(id){
+  const p = DB.casteoPartidos.find(x=>x.id===id);
+  if(!p) return;
+  editPartidoCasteoTarget = id;
+  document.getElementById('ecNombre').value = p.nombre;
+  document.getElementById('ecRepresentante').value = p.representante;
+  document.getElementById('ecFecha').value = p.fecha||'';
+  document.getElementById('modalEditarPartidoCasteo').classList.add('active');
+}
+function cerrarModalEditarPartidoCasteo(){ document.getElementById('modalEditarPartidoCasteo').classList.remove('active'); editPartidoCasteoTarget=null; }
+function guardarEdicionPartidoCasteo(){
+  const p = DB.casteoPartidos.find(x=>x.id===editPartidoCasteoTarget);
+  if(!p) return;
+  const nombre = document.getElementById('ecNombre').value.trim();
+  const representante = document.getElementById('ecRepresentante').value.trim();
+  if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
+  const nombreAnterior = p.nombre;
+  p.nombre = nombre;
+  p.representante = representante;
+  p.fecha = document.getElementById('ecFecha').value;
+  if(nombreAnterior.toLowerCase()!==nombre.toLowerCase()){
+    DB.pollos.forEach(g=>{ if(g.partidoCasteoId===p.id) g.partido = nombre; });
+  }
+  saveDB();
+  cerrarModalEditarPartidoCasteo();
+  toast('Partido actualizado');
+  renderAll();
+}
+function agregarPollo(partidoCasteoId){
+  const p = DB.casteoPartidos.find(x=>x.id===partidoCasteoId);
+  if(!p) return;
+  const nombre = document.getElementById('pc_nombre_'+partidoCasteoId).value.trim();
+  const anillo = document.getElementById('pc_anillo_'+partidoCasteoId).value.trim();
+  const color = document.getElementById('pc_color_'+partidoCasteoId).value.trim();
+  const casta = document.getElementById('pc_casta_'+partidoCasteoId).value.trim();
+  if(!anillo){ toast('Falta el número de anillo'); return; }
+  if(DB.pollos.some(g=>g.anillo && g.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay un pollo anillado con ese número'); return; }
+  DB.pollos.push({id:newId(), partidoCasteoId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', anillo, color, casta, fecha:p.fecha||''});
+  saveDB();
+  toast('Pollo registrado');
+  renderAll();
+}
+function borrarPollo(id){
+  confirmarAccion('¿Quitar este pollo del casteo?', ()=>{
+    DB.pollos = DB.pollos.filter(g=>g.id!==id);
+    saveDB(); renderAll();
+    toast('Pollo eliminado');
+  });
+}
+let editPolloTarget = null;
+function abrirEditarPollo(id){
+  const g = DB.pollos.find(x=>x.id===id);
+  if(!g) return;
+  editPolloTarget = id;
+  document.getElementById('epoNombre').value = g.nombre;
+  document.getElementById('epoAnillo').value = g.anillo||'';
+  document.getElementById('epoColor').value = g.color||'';
+  document.getElementById('epoCasta').value = g.casta||'';
+  document.getElementById('modalEditarPollo').classList.add('active');
+}
+function cerrarModalEditarPollo(){ document.getElementById('modalEditarPollo').classList.remove('active'); editPolloTarget=null; }
+function guardarEdicionPollo(){
+  const g = DB.pollos.find(x=>x.id===editPolloTarget);
+  if(!g) return;
+  const anillo = document.getElementById('epoAnillo').value.trim();
+  if(!anillo){ toast('Falta el número de anillo'); return; }
+  if(DB.pollos.some(x=>x.id!==g.id && x.anillo && x.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay otro pollo con ese anillo'); return; }
+  g.nombre = document.getElementById('epoNombre').value.trim() || '—';
+  g.anillo = anillo;
+  g.color = document.getElementById('epoColor').value.trim();
+  g.casta = document.getElementById('epoCasta').value.trim();
+  saveDB();
+  cerrarModalEditarPollo();
+  toast('Pollo actualizado');
+  renderAll();
+}
+function renderCasteoPartidos(){
+  const wrap = document.getElementById('casteoPartidosWrap');
+  if(!wrap) return;
+  if(!DB.casteoPartidos.length){ wrap.innerHTML = emptyState('Sin partidos en el casteo','Inscribe el primer partido arriba para empezar a anillar pollos.'); return; }
+  const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
+  wrap.innerHTML = DB.casteoPartidos.map(p=>{
+    const roster = DB.pollos.filter(g=>g.partidoCasteoId===p.id);
+    return `<div class="panel" style="margin-bottom:12px;">
+      <div class="panel-head">
+        <div><span class="panel-eyebrow">Rep. ${p.representante}${p.fecha?' · '+p.fecha:''}</span><h2 style="font-size:19px;">${p.nombre}</h2></div>
+        <div class="panel-actions">
+          <span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>${roster.length} pollo${roster.length===1?'':'s'}</span>
+          <button class="icon-btn" onclick="imprimirHojaCasteo(${p.id})" title="Imprimir hoja de este partido">🖶</button>
+          <button class="icon-btn" onclick="abrirEditarPartidoCasteo(${p.id})" title="Editar partido">✎</button>
+          <button class="icon-btn" onclick="borrarPartidoCasteo(${p.id})" title="Quitar partido">✕</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:8px;">
+          <input id="pc_nombre_${p.id}" placeholder="Apodo (opcional)" style="${inputStyle}">
+          <input id="pc_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
+          <input id="pc_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <input id="pc_casta_${p.id}" placeholder="Casta" style="${inputStyle}">
+          <button class="btn btn-primary btn-sm" onclick="agregarPollo(${p.id})">+ Agregar</button>
+        </div>
+        ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
+            <span>${g.nombre} <span style="color:var(--text-muted);">— Anillo #${g.anillo}${g.color?' · '+g.color:''}${g.casta?' · '+g.casta:''}</span></span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <button class="icon-btn" onclick="abrirEditarPollo(${g.id})" title="Editar pollo">✎</button>
+              <button class="icon-btn" onclick="borrarPollo(${g.id})" title="Quitar pollo">✕</button>
+            </span>
+          </div>`).join('')}</div>` : `<div class="helptext">Aún sin pollos registrados en este partido.</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+function imprimirHojaCasteo(partidoCasteoId){
+  const p = DB.casteoPartidos.find(x=>x.id===partidoCasteoId);
+  if(!p) return;
+  const roster = DB.pollos.filter(g=>g.partidoCasteoId===partidoCasteoId);
+  const w = window.open('', '_blank', 'width=650,height=800');
+  w.document.write(`
+    <html><head><title>Hoja de Casteo - ${p.nombre}</title>
+    <style>
+      body{font-family:'Courier New',monospace;padding:26px;color:#111;}
+      h1{font-size:21px;margin-bottom:2px;letter-spacing:1px;}
+      .sub{font-size:11px;color:#555;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase;}
+      .folio{font-size:13px;font-weight:bold;margin-top:14px;margin-bottom:16px;border:1px solid #111;display:inline-block;padding:4px 10px;}
+      table{width:100%;border-collapse:collapse;}
+      th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 4px;border-bottom:1px solid #111;}
+      td{padding:7px 4px;font-size:12.5px;border-bottom:1px solid #ccc;}
+    </style></head><body>
+    <h1>PUESTOS 15 · Hoja de Casteo</h1>
+    <div class="sub">${DB.torneo.nombre||''} ${DB.torneo.sede?'· '+DB.torneo.sede:''}</div>
+    <div class="folio">${p.nombre} · Rep. ${p.representante}${p.fecha?' · '+p.fecha:''} · ${roster.length} pollos</div>
+    <table><tr><th>#</th><th>Apodo</th><th>Anillo</th><th>Color</th><th>Casta</th></tr>
+      ${roster.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nombre}</td><td>#${g.anillo}</td><td>${g.color||'—'}</td><td>${g.casta||'—'}</td></tr>`).join('')}
+    </table>
+    </body></html>
+  `);
+  w.document.close(); w.print();
+}
+function imprimirHojaCasteoCompleta(){
+  if(!DB.casteoPartidos.length){ toast('No hay partidos de casteo registrados'); return; }
+  const w = window.open('', '_blank', 'width=650,height=800');
+  const bloques = DB.casteoPartidos.map(p=>{
+    const roster = DB.pollos.filter(g=>g.partidoCasteoId===p.id);
+    return `<div class="folio">${p.nombre} · Rep. ${p.representante}${p.fecha?' · '+p.fecha:''} · ${roster.length} pollos</div>
+      <table><tr><th>#</th><th>Apodo</th><th>Anillo</th><th>Color</th><th>Casta</th></tr>
+        ${roster.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nombre}</td><td>#${g.anillo}</td><td>${g.color||'—'}</td><td>${g.casta||'—'}</td></tr>`).join('')}
+      </table>`;
+  }).join('<div style="height:20px;"></div>');
+  w.document.write(`
+    <html><head><title>Casteo Completo</title>
+    <style>
+      body{font-family:'Courier New',monospace;padding:26px;color:#111;}
+      h1{font-size:21px;margin-bottom:2px;letter-spacing:1px;}
+      .sub{font-size:11px;color:#555;margin-bottom:16px;letter-spacing:1px;text-transform:uppercase;}
+      .folio{font-size:13px;font-weight:bold;margin-top:14px;margin-bottom:10px;border:1px solid #111;display:inline-block;padding:4px 10px;}
+      table{width:100%;border-collapse:collapse;margin-bottom:6px;}
+      th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 4px;border-bottom:1px solid #111;}
+      td{padding:7px 4px;font-size:12.5px;border-bottom:1px solid #ccc;}
+    </style></head><body>
+    <h1>PUESTOS 15 · Casteo Completo</h1>
+    <div class="sub">${DB.torneo.nombre||''} ${DB.torneo.sede?'· '+DB.torneo.sede:''}</div>
+    ${bloques}
+    </body></html>
+  `);
+  w.document.close(); w.print();
+}
+function buscarPolloPorAnillo(anillo){
+  if(!anillo) return null;
+  return DB.pollos.find(g=>g.anillo && g.anillo.toLowerCase()===anillo.trim().toLowerCase()) || null;
+}
+function verificarAnilloEnCasteo(anilloInputId, partidoNombre){
+  const anillo = document.getElementById(anilloInputId).value.trim();
+  if(!anillo) return;
+  const pollo = buscarPolloPorAnillo(anillo);
+  if(!pollo){ toast(`Aviso: el anillo #${anillo} no está registrado en el Casteo`); return; }
+  if(partidoNombre && pollo.partido.toLowerCase()!==partidoNombre.toLowerCase()){
+    toast(`⚠ El anillo #${anillo} está casteado a nombre de "${pollo.partido}", no de "${partidoNombre}"`);
+  }else{
+    toast(`✓ Verificado en Casteo: ${pollo.partido} — ${pollo.color||'sin color'}${pollo.casta?' · '+pollo.casta:''}`);
+  }
 }
 function borrarPartido(id){
   confirmarAccion('¿Quitar este partido de la inscripción?', ()=>{
@@ -1620,6 +1924,7 @@ function abrirEditarPartido(id){
   editPartidoTarget = id;
   document.getElementById('epNombre').value = p.nombre;
   document.getElementById('epRepresentante').value = p.representante;
+  document.getElementById('epTelefono').value = p.telefono||'';
   document.getElementById('modalEditarPartido').classList.add('active');
 }
 function cerrarModalEditarPartido(){ document.getElementById('modalEditarPartido').classList.remove('active'); editPartidoTarget=null; }
@@ -1632,6 +1937,7 @@ function guardarEdicionPartido(){
   const nombreAnterior = p.nombre;
   p.nombre = nombre;
   p.representante = representante;
+  p.telefono = document.getElementById('epTelefono').value.trim();
   if(nombreAnterior.toLowerCase() !== nombre.toLowerCase()){
     DB.gallos.forEach(g=>{ if(g.partido.toLowerCase()===nombreAnterior.toLowerCase()) g.partido = nombre; });
     DB.excepciones.forEach(e=>{
@@ -1686,11 +1992,12 @@ function renderPartidos(){
         </div>
       </div>
       <div class="panel-body">
-        <div class="form-grid" style="grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:8px;">
+        <div class="form-grid" style="grid-template-columns:1.4fr 1fr 1fr 1fr auto auto;gap:8px;">
           <input id="pg_nombre_${p.id}" placeholder="Nombre del gallo" style="${inputStyle}">
           <input id="pg_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg" style="${inputStyle}">
           <input id="pg_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
           <input id="pg_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <button class="btn btn-ghost btn-sm" onclick="verificarAnilloEnCasteo('pg_anillo_${p.id}', '${p.nombre.replace(/'/g,"\\'")}')" title="Verificar contra el Casteo">🔍</button>
           <button class="btn btn-primary btn-sm" onclick="agregarGalloAPartido(${p.id})">+ Agregar</button>
         </div>
         ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
@@ -1727,11 +2034,12 @@ function renderPartidosGeneral(){
         </div>
       </div>
       <div class="panel-body">
-        <div class="form-grid" style="grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:8px;">
+        <div class="form-grid" style="grid-template-columns:1.4fr 1fr 1fr 1fr auto auto;gap:8px;">
           <input id="pgg_nombre_${p.id}" placeholder="Nombre del gallo" style="${inputStyle}">
           <input id="pgg_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg" style="${inputStyle}">
           <input id="pgg_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
           <input id="pgg_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <button class="btn btn-ghost btn-sm" onclick="verificarAnilloEnCasteo('pgg_anillo_${p.id}', '${p.nombre.replace(/'/g,"\\'")}')" title="Verificar contra el Casteo">🔍</button>
           <button class="btn btn-primary btn-sm" onclick="agregarGalloAPartidoGeneral(${p.id})">+ Agregar</button>
         </div>
         ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
@@ -1858,6 +2166,71 @@ function swapColores(id){
   saveDB(); renderAll();
 }
 function gallo(id){ return DB.gallos.find(g=>g.id===id); }
+function partidoPorNombre(nombre){
+  return DB.partidos.find(p=>p.nombre.toLowerCase()===(nombre||'').toLowerCase());
+}
+function whatsappUrl(telefono, mensaje){
+  let tel = (telefono||'').replace(/[^0-9]/g,'');
+  if(!tel) return null;
+  if(tel.length===10) tel = '52'+tel; // si son 10 dígitos, asume México
+  return `https://wa.me/${tel}?text=${encodeURIComponent(mensaje)}`;
+}
+function abrirWhatsApp(telefono, mensaje){
+  const url = whatsappUrl(telefono, mensaje);
+  if(!url){ toast('Ese partido no tiene WhatsApp guardado — agrégalo editando el partido'); return; }
+  window.open(url, '_blank');
+}
+function avisarPeleaPorWhatsApp(peleaId, lado){
+  const c = DB.peleas.find(x=>x.id===peleaId);
+  if(!c) return;
+  const propio = lado==='rojo' ? gallo(c.rojo) : gallo(c.verde);
+  const rival = lado==='rojo' ? gallo(c.verde) : gallo(c.rojo);
+  if(!propio||!rival) return;
+  const p = partidoPorNombre(propio.partido);
+  const msg = `🐓 *PUESTOS 15*\nFrente Nº ${String(c.numero).padStart(3,'0')} — ${MODALIDAD_LABEL[c.tipo]}${c.ronda?' Ronda '+c.ronda:''}\n\n${propio.partido}, te toca *LADO ${lado.toUpperCase()}*.\nTu gallo: ${propio.nombre}${propio.anillo?' (anillo #'+propio.anillo+')':''}\nVa contra: ${rival.partido} — ${rival.nombre}\n\n¡Despierta y amarra tu gallo, ya casi te toca! 🔔`;
+  abrirWhatsApp(p ? p.telefono : '', msg);
+}
+function avisarAnticipadoPorWhatsApp(peleaId, lado){
+  const c = DB.peleas.find(x=>x.id===peleaId);
+  if(!c) return;
+  const propio = lado==='rojo' ? gallo(c.rojo) : gallo(c.verde);
+  const rival = lado==='rojo' ? gallo(c.verde) : gallo(c.rojo);
+  if(!propio||!rival) return;
+  const p = partidoPorNombre(propio.partido);
+  const msg = `🐓 *PUESTOS 15*\n¡Aviso anticipado! Te toca en 2 peleas más.\n\nFrente Nº ${String(c.numero).padStart(3,'0')} — ${MODALIDAD_LABEL[c.tipo]}${c.ronda?' Ronda '+c.ronda:''}\n${propio.partido}, vas por *LADO ${lado.toUpperCase()}*.\nTu gallo: ${propio.nombre}${propio.anillo?' (anillo #'+propio.anillo+')':''}\nVa contra: ${rival.partido} — ${rival.nombre}\n\n⏰ Empieza a despertar y amarrar tu gallo, ya te falta poco.`;
+  abrirWhatsApp(p ? p.telefono : '', msg);
+}
+function avisarResultadoPorWhatsApp(peleaId, lado){
+  const c = DB.peleas.find(x=>x.id===peleaId);
+  if(!c || c.estado!=='finalizado') return;
+  const propio = lado==='rojo' ? gallo(c.rojo) : gallo(c.verde);
+  if(!propio) return;
+  const p = partidoPorNombre(propio.partido);
+  let resultadoTxt;
+  if(c.resultado===lado) resultadoTxt = `🏆 ¡GANASTE! Tu gallo ${propio.nombre} ganó el Frente Nº ${String(c.numero).padStart(3,'0')}.`;
+  else if(c.resultado==='tabla') resultadoTxt = `🤝 Frente Nº ${String(c.numero).padStart(3,'0')}: fue TABLA.`;
+  else resultadoTxt = `Frente Nº ${String(c.numero).padStart(3,'0')}: tu gallo ${propio.nombre} perdió. La próxima será.`;
+  const msg = `🐓 *PUESTOS 15*\n${p?p.nombre+', ':''}${resultadoTxt}`;
+  abrirWhatsApp(p ? p.telefono : '', msg);
+}
+function avisarPosicionPorWhatsApp(partidoNombre){
+  const p = partidoPorNombre(partidoNombre);
+  if(!p){ toast('No encontré ese partido'); return; }
+  const derbyPeleas = DB.peleas.filter(c=>c.tipo==='derby' && c.estado==='finalizado');
+  let pts=0, g=0, e=0, perd=0;
+  derbyPeleas.forEach(c=>{
+    const a = gallo(c.rojo), b = gallo(c.verde);
+    if(!a||!b) return;
+    if(a.partido.toLowerCase()===partidoNombre.toLowerCase()){
+      if(c.resultado==='rojo'){ pts+=2; g++; } else if(c.resultado==='tabla'){ pts+=1; e++; } else perd++;
+    }
+    if(b.partido.toLowerCase()===partidoNombre.toLowerCase()){
+      if(c.resultado==='verde'){ pts+=2; g++; } else if(c.resultado==='tabla'){ pts+=1; e++; } else perd++;
+    }
+  });
+  const msg = `🐓 *PUESTOS 15* — Posiciones\n\n${p.nombre}, así vas hasta ahora:\n🏆 ${pts} puntos\n✅ ${g} ganadas · 🤝 ${e} tablas · ❌ ${perd} perdidas`;
+  abrirWhatsApp(p.telefono, msg);
+}
 
 function renderCotejos(){
   const grid = document.getElementById('ticketGrid');
@@ -1900,6 +2273,15 @@ function renderCotejos(){
         <button class="btn btn-ghost" onclick="imprimirHoja(${c.id})">Hoja</button>
         ${!cerrado ? `<button class="btn btn-ghost" onclick="swapColores(${c.id})" title="Intercambiar colores">⇄</button>` : ''}
         ${!cerrado ? `<button class="btn btn-danger" onclick="deshacerPelea(${c.id})">Deshacer</button>` : ''}
+      </div>
+      <div class="fc-actions" style="padding-top:0;">
+        ${!cerrado ? `
+          <button class="btn btn-ghost" style="color:var(--rojo);" onclick="avisarPeleaPorWhatsApp(${c.id},'rojo')" title="Avisar a ${a.partido} por WhatsApp">📱 Avisar Rojo</button>
+          <button class="btn btn-ghost" style="color:var(--verde);" onclick="avisarPeleaPorWhatsApp(${c.id},'verde')" title="Avisar a ${b.partido} por WhatsApp">📱 Avisar Verde</button>
+        ` : `
+          <button class="btn btn-ghost" style="color:var(--rojo);" onclick="avisarResultadoPorWhatsApp(${c.id},'rojo')" title="Avisar resultado a ${a.partido}">📱 Resultado Rojo</button>
+          <button class="btn btn-ghost" style="color:var(--verde);" onclick="avisarResultadoPorWhatsApp(${c.id},'verde')" title="Avisar resultado a ${b.partido}">📱 Resultado Verde</button>
+        `}
       </div>
     </div>`;
   }).join('');
@@ -2107,18 +2489,35 @@ function renderMarcador(){
   const lista = marcadorListaPeleas();
   if(!lista.length){
     wrap.innerHTML = emptyState('Sin combates armados','Corre el Cotejador (Derby, Rápidas o Compromiso) para tener peleas que mostrar aquí.');
+    const avWrap = document.getElementById('marcadorAvisosWrap'); if(avWrap) avWrap.innerHTML='';
     return;
   }
   if(!marcadorPeleaId || !lista.some(c=>c.id===marcadorPeleaId)) marcadorPeleaId = lista[0].id;
   const c = DB.peleas.find(x=>x.id===marcadorPeleaId);
   const a = gallo(c.rojo), b = gallo(c.verde);
-  if(!a||!b){ wrap.innerHTML = emptyState('Combate no disponible','Uno de los gallos de este combate ya no existe.'); return; }
+  if(!a||!b){ wrap.innerHTML = emptyState('Combate no disponible','Uno de los gallos de este combate ya no existe.'); const avWrap = document.getElementById('marcadorAvisosWrap'); if(avWrap) avWrap.innerHTML=''; return; }
   const cerrado = c.estado==='finalizado';
   let banner = '';
   if(cerrado){
     if(c.resultado==='rojo') banner = `<div class="marcador-resultado-banner r">🏆 Ganó Lado Rojo — ${a.partido}</div>`;
     else if(c.resultado==='verde') banner = `<div class="marcador-resultado-banner v">🏆 Ganó Lado Verde — ${b.partido}</div>`;
     else banner = `<div class="marcador-resultado-banner t">🤝 Tabla</div>`;
+  }
+  const pendientesAhora = lista.filter(x=>x.estado==='pendiente');
+  const iAhora = pendientesAhora.findIndex(x=>x.id===marcadorPeleaId);
+  const proxima = iAhora>=0 ? pendientesAhora[iAhora+1] : (pendientesAhora[0] && pendientesAhora[0].id!==marcadorPeleaId ? pendientesAhora[0] : null);
+  let siguienteStrip = '';
+  if(proxima){
+    const pa = gallo(proxima.rojo), pb = gallo(proxima.verde);
+    if(pa && pb){
+      siguienteStrip = `<div class="marcador-siguiente">
+        <div class="marcador-siguiente-tag">Sigue</div>
+        <div class="marcador-siguiente-nombres">
+          <span class="r">${pa.partido}</span><span class="vsdot">vs</span><span class="v">${pb.partido}</span>
+        </div>
+        <div class="marcador-siguiente-prep">¡Preparen sus gallos!</div>
+      </div>`;
+    }
   }
   wrap.innerHTML = `
     <div class="marcador-stage" id="marcadorStage">
@@ -2155,8 +2554,28 @@ function renderMarcador(){
         <button class="mg-t" onclick="marcadorMarcarGanador('tabla')">Tabla</button>
         <button class="mg-v" onclick="marcadorMarcarGanador('verde')">Ganó Verde</button>
       </div>
+      ${siguienteStrip}
     </div>
   `;
+  renderMarcadorAviso(lista);
+}
+function renderMarcadorAviso(lista){
+  const wrap = document.getElementById('marcadorAvisosWrap');
+  if(!wrap) return;
+  // solo tiene sentido entre las pendientes, en orden de cola
+  const pendientes = lista.filter(c=>c.estado==='pendiente');
+  const iActual = pendientes.findIndex(c=>c.id===marcadorPeleaId);
+  const siguiente = iActual>=0 ? pendientes[iActual+2] : null;
+  if(!siguiente){ wrap.innerHTML = ''; return; }
+  const a = gallo(siguiente.rojo), b = gallo(siguiente.verde);
+  if(!a||!b){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<div class="marcador-aviso">
+    <div class="marcador-aviso-txt">🔔 En 2 peleas le toca a <b>Frente Nº ${String(siguiente.numero).padStart(3,'0')}</b>: <b style="color:var(--rojo)">${a.partido}</b> vs <b style="color:var(--verde)">${b.partido}</b> — avísales con tiempo.</div>
+    <div class="marcador-aviso-btns">
+      <button class="btn btn-ghost btn-sm" style="color:var(--rojo);" onclick="avisarAnticipadoPorWhatsApp(${siguiente.id},'rojo')">📱 Avisar a ${a.partido}</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--verde);" onclick="avisarAnticipadoPorWhatsApp(${siguiente.id},'verde')">📱 Avisar a ${b.partido}</button>
+    </div>
+  </div>`;
 }
 
 /* ===================== RESULTADOS ===================== */
@@ -2251,7 +2670,7 @@ function renderPosiciones(){
   });
   const lista = Object.values(partidos).sort((x,y)=> y.pts-x.pts || y.g-x.g);
   if(!lista.length){ wrap.innerHTML = emptyState('Sin datos de derby','Registra gallos con su partido y cierra combates de modalidad Derby para ver la tabla.'); return; }
-  let html = `<div class="standings-row head"><span>#</span><span>Partido</span><span>PTS</span><span>G</span><span>E</span><span class="hide-mobile">Jugadas</span></div>`;
+  let html = `<div class="standings-row head"><span>#</span><span>Partido</span><span>PTS</span><span>G</span><span>E</span><span class="hide-mobile">Jugadas</span><span></span></div>`;
   lista.forEach((p,i)=>{
     const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
     const insc = DB.partidos.find(x=>x.nombre.toLowerCase()===p.partido.toLowerCase());
@@ -2262,6 +2681,7 @@ function renderPosiciones(){
       <span class="standings-num">${p.g}</span>
       <span class="standings-num">${p.e}</span>
       <span class="standings-num hide-mobile">${p.jugadas}</span>
+      <button class="icon-btn" onclick="avisarPosicionPorWhatsApp('${p.partido.replace(/'/g,"\\'")}')" title="Avisar puntos por WhatsApp">📱</button>
     </div>`;
   });
   wrap.innerHTML = html;
@@ -2427,6 +2847,7 @@ function renderAll(){
   renderDerbysConfigList();
   renderPartidos();
   renderPartidosGeneral();
+  renderCasteoPartidos();
   populateDerbySelectGeneral();
   populatePartidosDatalist();
   renderDerbysPage();
