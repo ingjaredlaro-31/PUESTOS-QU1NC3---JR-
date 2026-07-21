@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
   --bg:#0D0F12;
@@ -23,9 +24,11 @@
   --verde-glow:rgba(46,158,82,0.15);
   --oxblood:var(--rojo);
   --oxblood-dark:var(--rojo-dark);
-  --gold:#F2B90B;
-  --gold-soft:#C99A1F;
-  --gold-dim:#8C7018;
+  --gold:var(--verde);
+  --gold-soft:var(--verde-dark);
+  --gold-dim:var(--verde-dark);
+  --amber:#F2B90B;
+  --amber-soft:#C99A1F;
   --silver:#D4D6DA;
   --silver-dim:#8F949C;
   --paper:#F3EEDD;
@@ -42,9 +45,9 @@
 html{scroll-behavior:smooth;}
 body{
   background:
-    repeating-linear-gradient(115deg, rgba(242,185,11,0.02) 0px, rgba(242,185,11,0.02) 1px, transparent 1px, transparent 64px),
-    radial-gradient(circle at 12% -5%, rgba(242,185,11,0.10), transparent 42%),
-    radial-gradient(circle at 105% 105%, rgba(242,185,11,0.06), transparent 48%),
+    repeating-linear-gradient(115deg, rgba(216,52,42,0.015) 0px, rgba(216,52,42,0.015) 1px, transparent 1px, transparent 64px),
+    radial-gradient(circle at 8% -5%, rgba(216,52,42,0.14), transparent 42%),
+    radial-gradient(circle at 105% 105%, rgba(46,158,82,0.12), transparent 48%),
     var(--bg);
   color:var(--text);
   font-family:var(--body);
@@ -60,8 +63,10 @@ body{
 a{color:inherit;}
 
 /* ===== decorative ring motif ===== */
-.ring-deco{position:absolute;border-radius:50%;border:1px solid var(--gold-dim);opacity:.35;pointer-events:none;}
-.ring-deco.thin{border-width:1px;}
+.ring-deco{position:absolute;border-radius:50%;border:2px dashed var(--gold-dim);opacity:.3;pointer-events:none;}
+.ring-deco::after{content:"";position:absolute;inset:10px;border-radius:50%;border:1px solid var(--rojo-dark);opacity:.5;}
+.ring-deco.thin{border-width:1px;border-style:solid;}
+.ring-deco.thin::after{content:none;}
 
 /* ===== BRAND LOGO (real uploaded artwork) ===== */
 .brand-logo-img{display:block;height:auto;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);}
@@ -168,10 +173,10 @@ a{color:inherit;}
   white-space:nowrap;
 }
 .btn:active{transform:translateY(1px);}
-.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-soft));color:#171208;box-shadow:0 2px 8px rgba(242,185,11,.3);}
-.btn-primary:hover{filter:brightness(1.12);box-shadow:0 4px 14px rgba(242,185,11,.4);}
-.btn-gold{background:linear-gradient(135deg,var(--silver),#6E6E66);color:#14120F;box-shadow:0 2px 8px rgba(0,0,0,.3);}
-.btn-gold:hover{filter:brightness(1.08);box-shadow:0 4px 14px rgba(0,0,0,.4);}
+.btn-primary{background:linear-gradient(135deg,var(--rojo),var(--oxblood-dark));color:var(--cream);box-shadow:0 2px 8px rgba(216,52,42,.3);}
+.btn-primary:hover{filter:brightness(1.12);box-shadow:0 4px 14px rgba(216,52,42,.4);}
+.btn-gold{background:linear-gradient(135deg,var(--verde),var(--verde-dark));color:var(--cream);box-shadow:0 2px 8px rgba(46,158,82,.3);}
+.btn-gold:hover{filter:brightness(1.08);box-shadow:0 4px 14px rgba(46,158,82,.4);}
 .btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border);}
 .btn-ghost:hover{color:var(--text);border-color:var(--gold-soft);}
 .btn-danger{background:transparent;color:var(--rojo);border:1px solid var(--rojo-dark);}
@@ -233,7 +238,10 @@ a{color:inherit;}
 /* ===== HERO (dashboard) ===== */
 .hero{
   position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--border);
-  background:linear-gradient(120deg, var(--bg-panel-2) 0%, var(--bg-panel) 65%);
+  background:
+    radial-gradient(circle at 15% 120%, rgba(216,52,42,0.10), transparent 55%),
+    radial-gradient(circle at 100% -10%, rgba(46,158,82,0.10), transparent 50%),
+    linear-gradient(120deg, var(--bg-panel-2) 0%, var(--bg-panel) 65%);
   padding:30px 32px;margin-bottom:24px;box-shadow:0 4px 18px rgba(10,11,14,.08);
 }
 .hero .ring-deco:nth-child(1){width:260px;height:260px;top:-100px;right:-60px;border-color:var(--rojo-dark);}
@@ -464,7 +472,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
       <label>Contraseña</label>
       <input type="password" id="loginPass" placeholder="••••••" autocomplete="current-password">
     </div>
-    <button class="btn btn-primary btn-block" onclick="doLoginUnico()">Entrar</button>
+    <button class="btn btn-primary btn-block" id="loginBtn" onclick="doLoginUnico()">Entrar</button>
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
@@ -937,9 +945,12 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 <div class="toast" id="toast"></div>
 
 <script>
+/* ===================== SUPABASE (nube) ===================== */
+const SUPABASE_URL = 'https://jhefyepzhkkundrgsgdu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VbAl8hgPUve0io7NMdrssw_RQ217Y4t';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /* ===================== CUENTAS (multi-palenque) ===================== */
-const CUENTAS_INDEX_KEY = 'p15_cuentas_index';
-const USER_DIR_KEY = 'p15_user_directory';
 const LEGACY_KEY = 'puestos15_jr31_data_v3';
 let CUENTA_CODE = null;
 let LS_KEY = null;
@@ -947,52 +958,54 @@ let LS_KEY = null;
 function normalizarCodigo(str){
   return (str||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,20);
 }
-function getCuentasIndex(){
-  try{ return JSON.parse(localStorage.getItem(CUENTAS_INDEX_KEY)) || []; }catch(e){ return []; }
+async function cuentaExiste(code){
+  const {data, error} = await sb.from('palenques').select('code').eq('code', code).maybeSingle();
+  if(error){ console.error(error); return false; }
+  return !!data;
 }
-function saveCuentasIndex(list){ localStorage.setItem(CUENTAS_INDEX_KEY, JSON.stringify(list)); }
-function cuentaExiste(code){
-  return localStorage.getItem('p15_data_'+code) !== null;
+async function buscarPalenqueDeUsuario(username){
+  const {data, error} = await sb.from('usuarios_directorio').select('code').eq('username', username).maybeSingle();
+  if(error){ console.error(error); return null; }
+  return data ? data.code : null;
 }
-function getUserDirectory(){
-  try{ return JSON.parse(localStorage.getItem(USER_DIR_KEY)) || {}; }catch(e){ return {}; }
+async function registrarUsuarioEnDirectorio(username, code){
+  const {error} = await sb.from('usuarios_directorio').upsert({username, code, updated_at:new Date().toISOString()});
+  if(error) console.error(error);
 }
-function saveUserDirectory(d){ localStorage.setItem(USER_DIR_KEY, JSON.stringify(d)); }
-function registrarUsuarioEnDirectorio(username, code){
-  const d = getUserDirectory();
-  d[username] = code;
-  saveUserDirectory(d);
+async function quitarUsuarioDeDirectorio(username){
+  const {error} = await sb.from('usuarios_directorio').delete().eq('username', username);
+  if(error) console.error(error);
 }
-function quitarUsuarioDeDirectorio(username){
-  const d = getUserDirectory();
-  delete d[username];
-  saveUserDirectory(d);
-}
-function backfillDirectorio(){
-  const d = getUserDirectory();
-  const codes = new Set(getCuentasIndex().map(c=>c.code));
-  codes.add('JR31');
-  let changed = false;
-  codes.forEach(code=>{
-    if(!code) return;
+async function migrarDatosLocalesSiHacenFalta(){
+  // Si este dispositivo tiene datos guardados de antes (localStorage) y todavía no están en la nube, los sube.
+  try{
+    const legacy = localStorage.getItem(LEGACY_KEY);
+    if(legacy && !(await cuentaExiste('JR31'))){
+      const data = JSON.parse(legacy);
+      await sb.from('palenques').upsert({code:'JR31', data, updated_at:new Date().toISOString()});
+      for(const u of (data.usuarios||[])) await registrarUsuarioEnDirectorio(u.user, 'JR31');
+    }
+  }catch(e){ console.error('migración local→nube', e); }
+  // cualquier otra cuenta guardada localmente bajo el esquema viejo p15_data_*
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(!key || !key.startsWith('p15_data_')) continue;
+    const code = key.replace('p15_data_','');
     try{
-      const raw = localStorage.getItem('p15_data_'+code);
-      if(!raw) return;
-      const data = JSON.parse(raw);
-      (data.usuarios||[]).forEach(u=>{ if(d[u.user]!==code){ d[u.user]=code; changed=true; } });
-    }catch(e){}
-  });
-  if(changed) saveUserDirectory(d);
+      if(await cuentaExiste(code)) continue;
+      const data = JSON.parse(localStorage.getItem(key));
+      await sb.from('palenques').upsert({code, data, updated_at:new Date().toISOString()});
+      for(const u of (data.usuarios||[])) await registrarUsuarioEnDirectorio(u.user, code);
+    }catch(e){ console.error('migración', code, e); }
+  }
 }
-function intentarLogin(code, username, pass){
+async function intentarLogin(code, username, pass){
   CUENTA_CODE = code;
   LS_KEY = 'p15_data_'+code;
-  loadDB();
+  await loadDB();
   const found = DB.usuarios.find(u=>u.user===username && u.pass===pass);
   if(!found){ CUENTA_CODE=null; LS_KEY=null; DB=null; return false; }
   currentUser = found;
-  const idx = getCuentasIndex();
-  if(!idx.some(c=>c.code===code)){ idx.push({code, nombre:DB.torneo.nombre||code}); saveCuentasIndex(idx); }
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').classList.add('active');
   document.getElementById('userName').textContent = found.nombre || found.user;
@@ -1002,56 +1015,71 @@ function intentarLogin(code, username, pass){
   goto('dashboard');
   return true;
 }
-function doLoginUnico(){
+async function doLoginUnico(){
   const username = document.getElementById('loginUserText').value.trim();
   const pass = document.getElementById('loginPass').value;
   const err = document.getElementById('loginErr');
+  const btn = document.getElementById('loginBtn');
   if(!username || !pass){ err.textContent = 'Escribe tu usuario y contraseña.'; return; }
-  let code = getUserDirectory()[username];
-  // admin fijo del Ingeniero: funciona aunque este dispositivo nunca haya visto JR31
-  if(!code && username.toUpperCase()==='ADMIJR31'){
-    if(!cuentaExiste('JR31')){
-      const fresh = defaultDB();
-      fresh.torneo.nombre = 'JR31';
-      fresh.usuarios = [{user:'ADMIJR31', pass:'291329', rol:'admin', nombre:'Administrador'}];
-      localStorage.setItem('p15_data_JR31', JSON.stringify(fresh));
+  err.textContent = 'Conectando…';
+  if(btn) btn.disabled = true;
+  try{
+    let code = await buscarPalenqueDeUsuario(username);
+    // admin fijo del Ingeniero: funciona aunque este dispositivo/nube nunca haya visto JR31
+    if(!code && username.toUpperCase()==='ADMIJR31'){
+      if(!(await cuentaExiste('JR31'))){
+        const fresh = defaultDB();
+        fresh.torneo.nombre = 'JR31';
+        fresh.usuarios = [{user:'ADMIJR31', pass:'291329', rol:'admin', nombre:'Administrador'}];
+        await sb.from('palenques').insert({code:'JR31', data:fresh, updated_at:new Date().toISOString()});
+      }
+      code = 'JR31';
+      await registrarUsuarioEnDirectorio('ADMIJR31','JR31');
     }
-    code = 'JR31';
-    registrarUsuarioEnDirectorio('ADMIJR31','JR31');
+    if(!code){ err.textContent = 'Usuario o contraseña incorrectos.'; return; }
+    if(!(await intentarLogin(code, username, pass))){ err.textContent = 'Usuario o contraseña incorrectos.'; return; }
+    err.textContent = '';
+  }catch(e){
+    console.error(e);
+    err.textContent = 'No se pudo conectar con la nube. Revisa tu internet e intenta de nuevo.';
+  }finally{
+    if(btn) btn.disabled = false;
   }
-  if(!code){ err.textContent = 'Usuario o contraseña incorrectos.'; return; }
-  if(!intentarLogin(code, username, pass)){ err.textContent = 'Usuario o contraseña incorrectos.'; return; }
-  err.textContent = '';
 }
-function crearPalenqueDesdeAdmin(){
+async function crearPalenqueDesdeAdmin(){
   const code = normalizarCodigo(document.getElementById('palCodigo').value);
   const nombrePalenque = document.getElementById('palNombre').value.trim();
   const adminUser = document.getElementById('palAdminUser').value.trim();
   const adminPass = document.getElementById('palAdminPass').value.trim();
   const msg = document.getElementById('palenqueCrearMsg');
-  if(!code || !nombrePalenque || !adminUser || !adminPass){ msg.textContent = 'Completa todos los campos.'; msg.style.color='var(--rojo)'; return; }
-  if(cuentaExiste(code)){ msg.textContent = 'Ese código de palenque ya existe, usa otro.'; msg.style.color='var(--rojo)'; return; }
-  if(getUserDirectory()[adminUser]){ msg.textContent = 'Ese usuario ya existe en otro palenque, elige otro nombre.'; msg.style.color='var(--rojo)'; return; }
-  const fresh = defaultDB();
-  fresh.torneo.nombre = nombrePalenque;
-  fresh.usuarios = [{user:adminUser, pass:adminPass, rol:'admin', nombre:'Administrador'}];
-  localStorage.setItem('p15_data_'+code, JSON.stringify(fresh));
-  registrarUsuarioEnDirectorio(adminUser, code);
-  const idx = getCuentasIndex();
-  idx.push({code, nombre:nombrePalenque});
-  saveCuentasIndex(idx);
-  msg.style.color='var(--verde)';
-  msg.textContent = `Palenque "${nombrePalenque}" creado. Dale a ese palenque su usuario (${adminUser}) y contraseña para que entre.`;
-  ['palCodigo','palNombre','palAdminUser','palAdminPass'].forEach(id=>document.getElementById(id).value='');
-  renderPalenquesAdmin();
+  if(!code || !nombrePalenque || !adminUser || !adminPass){ msg.style.color='var(--rojo)'; msg.textContent = 'Completa todos los campos.'; return; }
+  msg.style.color='var(--text-muted)'; msg.textContent = 'Creando…';
+  try{
+    if(await cuentaExiste(code)){ msg.style.color='var(--rojo)'; msg.textContent = 'Ese código de palenque ya existe, usa otro.'; return; }
+    if(await buscarPalenqueDeUsuario(adminUser)){ msg.style.color='var(--rojo)'; msg.textContent = 'Ese usuario ya existe en otro palenque, elige otro nombre.'; return; }
+    const fresh = defaultDB();
+    fresh.torneo.nombre = nombrePalenque;
+    fresh.usuarios = [{user:adminUser, pass:adminPass, rol:'admin', nombre:'Administrador'}];
+    const {error} = await sb.from('palenques').insert({code, data:fresh, updated_at:new Date().toISOString()});
+    if(error) throw error;
+    await registrarUsuarioEnDirectorio(adminUser, code);
+    msg.style.color='var(--verde)';
+    msg.textContent = `Palenque "${nombrePalenque}" creado. Dale a ese palenque su usuario (${adminUser}) y contraseña para que entre.`;
+    ['palCodigo','palNombre','palAdminUser','palAdminPass'].forEach(id=>document.getElementById(id).value='');
+    renderPalenquesAdmin();
+  }catch(e){
+    console.error(e);
+    msg.style.color='var(--rojo)'; msg.textContent = 'No se pudo crear el palenque. Revisa tu internet e intenta de nuevo.';
+  }
 }
-function renderPalenquesAdmin(){
+async function renderPalenquesAdmin(){
   const wrap = document.getElementById('tablaPalenquesWrap');
   if(!wrap) return;
-  const list = getCuentasIndex();
-  if(!list.length){ wrap.innerHTML = emptyState('Sin palenques dados de alta','Crea el primero arriba.'); return; }
+  const {data, error} = await sb.from('palenques').select('code,data');
+  if(error){ wrap.innerHTML = emptyState('No se pudo cargar','Revisa tu conexión a internet.'); return; }
+  if(!data || !data.length){ wrap.innerHTML = emptyState('Sin palenques dados de alta','Crea el primero arriba.'); return; }
   wrap.innerHTML = `<table><thead><tr><th>Código</th><th>Nombre</th></tr></thead><tbody>
-    ${list.map(c=>`<tr><td><b style="color:var(--gold)">${c.code}</b></td><td>${c.nombre||'—'}</td></tr>`).join('')}
+    ${data.map(c=>`<tr><td><b style="color:var(--gold)">${c.code}</b></td><td>${(c.data&&c.data.torneo&&c.data.torneo.nombre)||'—'}</td></tr>`).join('')}
   </tbody></table>`;
 }
 
@@ -1075,30 +1103,47 @@ function defaultDB(){
     nextId:1
   };
 }
-function loadDB(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    DB = raw ? JSON.parse(raw) : defaultDB();
-    if(!DB.usuarios || !DB.usuarios.length) DB.usuarios = defaultDB().usuarios;
-    if(!DB.peleas) DB.peleas = [];
-    if(!DB.partidos) DB.partidos = [];
-    if(!DB.derbys){
-      // migración desde el viejo esquema de un solo derbyConfig
-      DB.derbys = [];
-      if(DB.derbyConfig){
-        const id = (DB.nextId||1);
-        DB.nextId = id+1;
-        DB.derbys.push({id, nombre:DB.derbyConfig.nombre||'Derby Principal', gallosPorPartido:DB.derbyConfig.gallosPorPartido||4, pesoMin:DB.derbyConfig.pesoMin||null, pesoMax:DB.derbyConfig.pesoMax||null, tolerancia:DB.derbyConfig.tolerancia||50, fecha:''});
-        DB.derbyActivoId = id;
-        DB.partidos.forEach(p=>{ if(!p.derbyId) p.derbyId = id; });
-      }
+function normalizarDB(){
+  if(!DB.usuarios || !DB.usuarios.length) DB.usuarios = defaultDB().usuarios;
+  if(!DB.peleas) DB.peleas = [];
+  if(!DB.partidos) DB.partidos = [];
+  if(!DB.derbys){
+    // migración desde el viejo esquema de un solo derbyConfig
+    DB.derbys = [];
+    if(DB.derbyConfig){
+      const id = (DB.nextId||1);
+      DB.nextId = id+1;
+      DB.derbys.push({id, nombre:DB.derbyConfig.nombre||'Derby Principal', gallosPorPartido:DB.derbyConfig.gallosPorPartido||4, pesoMin:DB.derbyConfig.pesoMin||null, pesoMax:DB.derbyConfig.pesoMax||null, tolerancia:DB.derbyConfig.tolerancia||50, fecha:''});
+      DB.derbyActivoId = id;
+      DB.partidos.forEach(p=>{ if(!p.derbyId) p.derbyId = id; });
     }
-    if(DB.derbyActivoId===undefined) DB.derbyActivoId = DB.derbys.length ? DB.derbys[0].id : null;
-    const legacyAdmin = DB.usuarios.find(u=>u.user==='INGJAREDLARO');
-    if(legacyAdmin) legacyAdmin.user = 'ADMIJR31';
-  }catch(e){ DB = defaultDB(); }
+  }
+  if(DB.derbyActivoId===undefined) DB.derbyActivoId = DB.derbys.length ? DB.derbys[0].id : null;
+  const legacyAdmin = DB.usuarios.find(u=>u.user==='INGJAREDLARO');
+  if(legacyAdmin) legacyAdmin.user = 'ADMIJR31';
 }
-function saveDB(){ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }
+async function loadDB(){
+  try{
+    const {data, error} = await sb.from('palenques').select('data').eq('code', CUENTA_CODE).maybeSingle();
+    if(error) throw error;
+    DB = data ? data.data : defaultDB();
+    normalizarDB();
+    localStorage.setItem(LS_KEY, JSON.stringify(DB)); // respaldo local por si se cae el internet
+  }catch(e){
+    console.error('No se pudo cargar de la nube, usando respaldo local si existe', e);
+    try{
+      const raw = localStorage.getItem(LS_KEY);
+      DB = raw ? JSON.parse(raw) : defaultDB();
+    }catch(e2){ DB = defaultDB(); }
+    normalizarDB();
+  }
+}
+function saveDB(){
+  localStorage.setItem(LS_KEY, JSON.stringify(DB));
+  sb.from('palenques').upsert({code:CUENTA_CODE, data:DB, updated_at:new Date().toISOString()}).then(({error})=>{
+    if(error) console.error('Error guardando en la nube', error);
+  });
+}
 function newId(){ return DB.nextId++; }
 function toast(msg){
   const t = document.getElementById('toast');
@@ -2002,17 +2047,17 @@ function renderPosiciones(){
 }
 
 /* ===================== USUARIOS ===================== */
-function agregarUsuario(){
+async function agregarUsuario(){
   const user = document.getElementById('uNuevoUser').value.trim();
   const pass = document.getElementById('uNuevoPass').value.trim();
   const rol = document.getElementById('uNuevoRol').value;
   if(!user||!pass){ toast('Falta usuario o contraseña'); return; }
   if(DB.usuarios.some(u=>u.user===user)){ toast('Ese usuario ya existe'); return; }
-  const dirCode = getUserDirectory()[user];
+  const dirCode = await buscarPalenqueDeUsuario(user);
   if(dirCode && dirCode!==CUENTA_CODE){ toast('Ese usuario ya existe en otro palenque, elige otro nombre'); return; }
   DB.usuarios.push({user, pass, rol, nombre:user});
   saveDB();
-  registrarUsuarioEnDirectorio(user, CUENTA_CODE);
+  await registrarUsuarioEnDirectorio(user, CUENTA_CODE);
   document.getElementById('uNuevoUser').value=''; document.getElementById('uNuevoPass').value='';
   toast('Usuario creado'); renderAll();
 }
@@ -2172,7 +2217,7 @@ const LOGO_DATA_URI = 'data:image/webp;base64,UklGRib0AABXRUJQVlA4IBr0AABQQAKdAS
 document.querySelectorAll('.brand-logo-img').forEach(img => img.src = LOGO_DATA_URI);
 
 /* ===================== INIT ===================== */
-backfillDirectorio();
+migrarDatosLocalesSiHacenFalta();
 document.getElementById('loginUserText').addEventListener('keydown', e=>{ if(e.key==='Enter') doLoginUnico(); });
 document.getElementById('loginPass').addEventListener('keydown', e=>{ if(e.key==='Enter') doLoginUnico(); });
 </script>
