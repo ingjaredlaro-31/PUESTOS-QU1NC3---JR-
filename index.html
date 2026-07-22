@@ -372,7 +372,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
 .fc-swap{position:absolute;top:14px;right:16px;}
 
 /* ===== POSICIONES / STANDINGS ===== */
-.standings-row{display:grid;grid-template-columns:44px 1fr 70px 70px 70px 80px 44px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--border-soft);}
+.standings-row{display:grid;grid-template-columns:44px 1fr 70px 70px 70px 80px 68px;gap:10px;align-items:center;padding:12px;border-bottom:1px solid var(--border-soft);}
 .standings-row.head{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);}
 .rank-badge{
   width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -543,7 +543,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
   .topbar{padding:14px 16px;}
   #menuToggle{display:inline-flex;}
   .hero-title{font-size:32px;}
-  .standings-row{grid-template-columns:34px 1fr 50px 50px 36px;font-size:12px;}
+  .standings-row{grid-template-columns:34px 1fr 50px 50px 60px;font-size:12px;}
   .standings-row span.hide-mobile{display:none;}
 }
 #menuToggle{display:none;background:none;border:1px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:4px;cursor:pointer;}
@@ -861,7 +861,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
         <div class="panel">
           <div class="panel-head"><div><span class="panel-eyebrow">Derby de Gallos</span><h2>Tabla de posiciones por partido</h2></div></div>
           <div class="panel-body" id="tablaPosicionesWrap"></div>
-          <div class="panel-body" style="padding-top:0;"><p class="helptext">Puntaje: victoria = 2 pts · tabla = 1 pt para cada lado · derrota = 0 pts.</p></div>
+          <div class="panel-body" style="padding-top:0;"><p class="helptext">Puntaje: victoria = 2 pts · tabla = 1 pt para cada lado · derrota = 0 pts. Con el ícono 🃏 puedes marcar un partido como <b>comodín</b> — para cuando necesites que entre a la siguiente ronda aunque no le toque estrictamente por puntos.</p></div>
         </div>
       </section>
 
@@ -1724,7 +1724,7 @@ function renderDerbysPage(){
       <div class="panel-body">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
           <div>
-            <div style="font-family:var(--display);font-weight:600;font-size:20px;color:var(--paper);letter-spacing:.02em;">${p.nombre}</div>
+            <div style="font-family:var(--display);font-weight:600;font-size:20px;color:var(--paper);letter-spacing:.02em;">${p.nombre}${p.comodin?' <span class="badge badge-pend" style="color:var(--gold);">🃏 Comodín</span>':''}</div>
             <div class="helptext" style="margin-top:2px;">Rep. ${p.representante}</div>
           </div>
           <span class="badge ${completo?'badge-ok':'badge-pend'}">${roster.length}/${cupo}</span>
@@ -2951,17 +2951,29 @@ function renderPosiciones(){
   lista.forEach((p,i)=>{
     const rankClass = i===0?'gold':i===1?'silver':i===2?'bronze':'';
     const insc = DB.partidos.find(x=>x.nombre.toLowerCase()===p.partido.toLowerCase());
-    html += `<div class="standings-row">
+    const esComodin = insc && insc.comodin;
+    html += `<div class="standings-row" style="${esComodin?'background:rgba(212,175,55,.06);':''}">
       <span class="rank-badge ${rankClass}">${i+1}</span>
-      <span class="partido-name">${p.partido}${insc?`<br><span style="font-size:10.5px;color:var(--text-muted);font-weight:400;">Rep. ${insc.representante}</span>`:''}</span>
+      <span class="partido-name">${p.partido}${esComodin?' <span class="badge badge-pend" style="color:var(--gold);">🃏 Comodín</span>':''}${insc?`<br><span style="font-size:10.5px;color:var(--text-muted);font-weight:400;">Rep. ${insc.representante}</span>`:''}</span>
       <span class="standings-pts">${p.pts}</span>
       <span class="standings-num">${p.g}</span>
       <span class="standings-num">${p.e}</span>
       <span class="standings-num hide-mobile">${p.jugadas}</span>
-      <button class="icon-btn" onclick="avisarPosicionPorWhatsApp('${p.partido.replace(/'/g,"\\'")}')" title="Avisar puntos por WhatsApp">📱</button>
+      <span style="display:flex;gap:4px;">
+        ${insc?`<button class="icon-btn" onclick="toggleComodin(${insc.id})" title="${esComodin?'Quitar comodín':'Marcar como comodín (entra a la siguiente ronda)'}">🃏</button>`:''}
+        <button class="icon-btn" onclick="avisarPosicionPorWhatsApp('${p.partido.replace(/'/g,"\\'")}')" title="Avisar puntos por WhatsApp">📱</button>
+      </span>
     </div>`;
   });
   wrap.innerHTML = html;
+}
+function toggleComodin(partidoId){
+  const p = DB.partidos.find(x=>x.id===partidoId);
+  if(!p) return;
+  p.comodin = !p.comodin;
+  saveDB();
+  toast(p.comodin ? `${p.nombre} marcado como comodín` : `${p.nombre} ya no es comodín`);
+  renderAll();
 }
 
 /* ===================== USUARIOS ===================== */
