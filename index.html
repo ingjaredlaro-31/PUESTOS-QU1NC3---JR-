@@ -725,12 +725,48 @@ tr:hover td{background:rgba(212,175,93,0.035);}
         </div>
       </section>
 
+      <!-- PELEAS RÁPIDAS (aparte, con todo) -->
+      <section class="view-section" id="view-rapidas">
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Inscripción</span><h2>Inscribir partido</h2></div></div>
+          <div class="panel-body">
+            <p class="helptext" style="margin-bottom:14px;">Peleas sueltas y rápidas: cada partido mete los gallos que traiga (uno, dos, los que sean) — sin llevar puntaje de derby ni pedir cupo completo.</p>
+            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+              <div class="field"><label>Nombre del partido</label><input id="prNombre" placeholder="Ej. Gallera El Progreso"></div>
+              <div class="field"><label>Representante</label><input id="prRepresentante" placeholder="Nombre del representante"></div>
+              <div class="field"><label>WhatsApp</label><input id="prTelefono" placeholder="Ej. 9181234567"></div>
+              <button class="btn btn-primary" onclick="inscribirPartidoRapida()">+ Inscribir partido</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Partidos y gallos</span><h2>Da de alta sus gallos</h2></div></div>
+          <div class="panel-body">
+            <div id="partidosRapidaCardsWrap"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Sorteo</span><h2>Cotejar peleas rápidas</h2></div></div>
+          <div class="panel-body">
+            <div class="form-grid" style="margin-bottom:14px;max-width:220px;">
+              <div class="field"><label>Tolerancia de peso (g)</label><input id="tolRapida" type="number" value="80"></div>
+            </div>
+            <button class="btn btn-gold" onclick="cotejarAutomatico('rapida')">⚡ Cotejar peleas rápidas</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Frentes armados</span><h2>Boletos de combate</h2></div></div>
+          <div class="panel-body">
+            <div class="ticket-grid" id="ticketGridRapida"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- COTEJADOR (3 modalidades) -->
       <section class="view-section" id="view-cotejar">
         <div class="panel">
           <div class="tabbar">
             <div class="tab active" id="tab-derby" onclick="switchTab('derby')"><span class="dot" style="background:var(--paper)"></span>Derby de Gallos</div>
-            <div class="tab" id="tab-rapida" onclick="switchTab('rapida')"><span class="dot" style="background:var(--verde)"></span>Peleas Rápidas</div>
             <div class="tab" id="tab-compromiso" onclick="switchTab('compromiso')"><span class="dot" style="background:var(--rojo)"></span>Peleas de Compromiso</div>
             <div class="tab" id="tab-casteo" onclick="switchTab('casteo')"><span class="dot" style="background:var(--gold)"></span>Casteo de Pollos</div>
           </div>
@@ -777,32 +813,6 @@ tr:hover td{background:rgba(212,175,93,0.035);}
           </div>
 
           <!-- RAPIDA TAB -->
-          <div class="tab-panel" id="tabpanel-rapida">
-            <div class="panel-body">
-              <p class="helptext" style="margin-bottom:16px;">Peleas sueltas y rápidas: cada partido mete los gallos que traiga (uno, dos, los que sean), y cotejas por peso a los que haya — sin llevar puntaje de derby ni pedir cupo completo.</p>
-
-              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;margin-bottom:18px;background:var(--bg-panel-3);">
-                <div class="panel-eyebrow" style="margin-bottom:10px;">Inscribir partido</div>
-                <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
-                  <div class="field"><label>Nombre del partido</label><input id="prNombre" placeholder="Ej. Gallera El Progreso"></div>
-                  <div class="field"><label>Representante</label><input id="prRepresentante" placeholder="Nombre del representante"></div>
-                  <div class="field"><label>WhatsApp</label><input id="prTelefono" placeholder="Ej. 9181234567"></div>
-                  <button class="btn btn-primary" onclick="inscribirPartidoRapida()">+ Inscribir partido</button>
-                </div>
-              </div>
-
-              <div id="partidosRapidaCardsWrap" style="margin-bottom:20px;"></div>
-
-              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;background:var(--bg-panel-3);">
-                <div class="panel-eyebrow" style="margin-bottom:10px;">Sorteo</div>
-                <div class="form-grid" style="margin-bottom:14px;max-width:220px;">
-                  <div class="field"><label>Tolerancia de peso (g)</label><input id="tolRapida" type="number" value="80"></div>
-                </div>
-                <button class="btn btn-gold" onclick="cotejarAutomatico('rapida')">⚡ Cotejar peleas rápidas</button>
-              </div>
-            </div>
-          </div>
-
           <!-- COMPROMISO TAB -->
           <div class="tab-panel" id="tabpanel-compromiso">
             <div class="panel-body">
@@ -1465,6 +1475,7 @@ const NAV_ITEMS = [
   {id:'dashboard', label:'Panel', icon:'◆', roles:['admin','juez']},
   {id:'gallos', label:'Partidos', icon:'▤', roles:['admin','juez']},
   {id:'casteo', label:'Casteo de Pollos', icon:'⬡', roles:['admin','juez']},
+  {id:'rapidas', label:'Peleas Rápidas', icon:'⚡', roles:['admin','juez']},
   {id:'cotejar', label:'Cotejador', icon:'⚔', roles:['admin','juez']},
   {id:'marcador', label:'Marcador en Vivo', icon:'▣', roles:['admin','juez']},
   {id:'resultados', label:'Resultados', icon:'✓', roles:['admin','juez']},
@@ -1478,7 +1489,8 @@ const TITLES = {
   dashboard:['Panel','Resumen general del Derby'],
   gallos:['Partidos','Partidos inscritos y sus gallos'],
   casteo:['Casteo de Pollos','Registro y anillado, antes del derby'],
-  cotejar:['Cotejador','Derby · Rápidas · Compromiso'],
+  rapidas:['Peleas Rápidas','Inscripción, sorteo y boletos aparte'],
+  cotejar:['Cotejador','Derby · Compromiso · Casteo'],
   marcador:['Marcador en Vivo','Pantalla para conectar a TV o proyector'],
   resultados:['Resultados','Captura de ganadores por combate'],
   posiciones:['Posiciones','Tabla del derby por partido'],
@@ -1516,7 +1528,7 @@ function goto(id){
 }
 function switchTab(tab){
   activeTab = tab;
-  ['derby','rapida','compromiso','casteo'].forEach(t=>{
+  ['derby','compromiso','casteo'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
     document.getElementById('tabpanel-'+t).classList.toggle('active', t===tab);
   });
@@ -2687,10 +2699,11 @@ function avisarPosicionPorWhatsApp(partidoNombre){
   abrirWhatsApp(p.telefono, msg);
 }
 
-function renderCotejos(){
-  const grid = document.getElementById('ticketGrid');
-  if(!DB.peleas.length){ grid.innerHTML = emptyState('Sin combates armados','Elige una modalidad arriba y arma tu primer frente.'); return; }
-  grid.innerHTML = [...DB.peleas].reverse().map(c=>{
+function renderFightCards(lista, targetId){
+  const grid = document.getElementById(targetId);
+  if(!grid) return;
+  if(!lista.length){ grid.innerHTML = emptyState('Sin combates armados','Arma tu primer frente arriba.'); return; }
+  grid.innerHTML = [...lista].reverse().map(c=>{
     const a = gallo(c.rojo), b = gallo(c.verde);
     if(!a||!b) return '';
     const cerrado = c.estado==='finalizado';
@@ -2740,6 +2753,12 @@ function renderCotejos(){
       </div>
     </div>`;
   }).join('');
+}
+function renderCotejos(){
+  renderFightCards(DB.peleas.filter(c=>c.tipo!=='rapida'), 'ticketGrid');
+}
+function renderCotejosRapida(){
+  renderFightCards(DB.peleas.filter(c=>c.tipo==='rapida'), 'ticketGridRapida');
 }
 
 function imprimirHoja(id){
@@ -3306,6 +3325,7 @@ function renderAll(){
   renderDashboard();
   renderGallos();
   renderCotejos();
+  renderCotejosRapida();
   renderResultados();
   renderPosiciones();
   renderExcepciones();
