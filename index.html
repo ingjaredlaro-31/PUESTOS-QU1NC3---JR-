@@ -688,15 +688,29 @@ tr:hover td{background:rgba(212,175,93,0.035);}
       <!-- CASTEO DE POLLOS -->
       <section class="view-section" id="view-casteo">
         <div class="panel">
-          <div class="panel-head"><div><span class="panel-eyebrow">Registro previo al derby</span><h2>Inscribir partido de casteo</h2></div></div>
+          <div class="panel-head"><div><span class="panel-eyebrow">Paso 1</span><h2>Crear un Casteo</h2></div></div>
           <div class="panel-body">
-            <p class="helptext" style="margin-bottom:14px;">El casteo es aparte del derby: aquí nomás se registran y anillan los pollos, meses antes de que peleen. Cuando ya arme el derby de verdad, puede verificar cada gallo contra lo que anotó aquí.</p>
-            <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+            <p class="helptext" style="margin-bottom:14px;">El casteo es aparte del derby: aquí nomás se registran y anillan los pollos, meses antes de que peleen. Puedes crear varios casteos (por temporada, por fecha, etc).</p>
+            <div class="form-grid">
+              <div class="field" style="grid-column:span 2;"><label>Nombre del Casteo</label><input id="csNombre" placeholder="Ej. Casteo Enero 2027"></div>
+              <div class="field"><label>Fecha del casteo (hoy que se anillan)</label><input id="csFechaCasteo" type="date"></div>
+              <div class="field"><label>Fecha del evento (cuándo pelean)</label><input id="csFechaEvento" type="date"></div>
+            </div>
+            <div style="margin-top:16px;"><button class="btn btn-primary" onclick="crearCasteo()">+ Crear casteo</button></div>
+            <div style="margin-top:18px;" id="casteosListWrap"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><span class="panel-eyebrow">Paso 2</span><h2>Inscribir partido al casteo</h2></div></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field"><label>Casteo</label><select id="ctCasteoSelect"></select></div>
               <div class="field"><label>Nombre del partido</label><input id="ctNombre" placeholder="Ej. Gallera El Progreso"></div>
               <div class="field"><label>Representante</label><input id="ctRepresentante" placeholder="Nombre del representante"></div>
-              <div class="field"><label>Fecha del casteo</label><input id="ctFecha" type="date"></div>
-              <button class="btn btn-primary" onclick="inscribirPartidoCasteo()">+ Inscribir partido</button>
+              <div class="field"><label>WhatsApp / Teléfono</label><input id="ctTelefono" placeholder="Ej. 9181234567"></div>
+              <div class="field" style="grid-column:span 2;"><label>Dirección</label><input id="ctDireccion" placeholder="Para ubicar al representante"></div>
             </div>
+            <div style="margin-top:16px;"><button class="btn btn-primary" onclick="inscribirPartidoCasteo()">+ Inscribir partido</button></div>
           </div>
         </div>
         <div class="panel">
@@ -718,6 +732,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
             <div class="tab active" id="tab-derby" onclick="switchTab('derby')"><span class="dot" style="background:var(--paper)"></span>Derby de Gallos</div>
             <div class="tab" id="tab-rapida" onclick="switchTab('rapida')"><span class="dot" style="background:var(--verde)"></span>Peleas Rápidas</div>
             <div class="tab" id="tab-compromiso" onclick="switchTab('compromiso')"><span class="dot" style="background:var(--rojo)"></span>Peleas de Compromiso</div>
+            <div class="tab" id="tab-casteo" onclick="switchTab('casteo')"><span class="dot" style="background:var(--gold)"></span>Casteo de Pollos</div>
           </div>
 
           <!-- DERBY TAB -->
@@ -732,6 +747,18 @@ tr:hover td{background:rgba(212,175,93,0.035);}
                   <div class="field"><label>Representante</label><input id="pRepresentante" placeholder="Nombre del representante"></div>
                   <div class="field"><label>WhatsApp</label><input id="pTelefono" placeholder="Ej. 9181234567"></div>
                   <button class="btn btn-primary" onclick="inscribirPartido()">+ Inscribir partido</button>
+                </div>
+              </div>
+
+              <div style="border:1px solid var(--gold-dim);border-radius:5px;padding:18px;margin-bottom:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Día del evento</div>
+                <p class="helptext" style="margin-bottom:12px;margin-top:0;">Ya casteado el partido meses antes, búscalo aquí y mete todos sus gallos de un jalón a este derby (nomás falta pesarlos).</p>
+                <div class="form-grid" style="grid-template-columns:1fr auto;align-items:end;">
+                  <div class="field"><label>Partido casteado</label>
+                    <input id="importCasteoInput" list="casteoPartidosList" placeholder="Escribe el nombre del partido…">
+                    <datalist id="casteoPartidosList"></datalist>
+                  </div>
+                  <button class="btn btn-gold" onclick="importarPartidoCasteado()">📥 Importar sus gallos</button>
                 </div>
               </div>
 
@@ -771,6 +798,22 @@ tr:hover td{background:rgba(212,175,93,0.035);}
               <div style="margin-top:16px;"><button class="btn btn-primary" onclick="crearCompromiso()">+ Armar pelea de compromiso</button></div>
             </div>
           </div>
+
+          <!-- CASTEO TAB -->
+          <div class="tab-panel" id="tabpanel-casteo">
+            <div class="panel-body">
+              <p class="helptext" style="margin-bottom:16px;">Pruebas entre los pollos ya anillados en el Casteo — mismo sistema de lado rojo/verde/tabla, pero aparte del Derby. Para inscribir partidos o dar de alta más pollos, ve a la sección Casteo de Pollos.</p>
+              <div class="helptext" id="casteoTabActivoInfo" style="margin-bottom:14px;"></div>
+              <div id="casteoCotejadorCardsWrap" style="margin-bottom:20px;"></div>
+              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Sorteo del casteo</div>
+                <div class="form-grid" style="margin-bottom:14px;max-width:220px;">
+                  <div class="field"><label>Tolerancia (g)</label><input id="tolCasteo" type="number" value="200"></div>
+                </div>
+                <button class="btn btn-gold" onclick="cotejarAutomatico('casteo')">⚔ Sorteo del casteo</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="panel">
@@ -803,6 +846,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
             <div class="tab" id="resfiltro-derby" onclick="filtrarResultados('derby')"><span class="dot" style="background:var(--gold)"></span>Derby</div>
             <div class="tab" id="resfiltro-rapida" onclick="filtrarResultados('rapida')"><span class="dot" style="background:var(--verde)"></span>Rápidas</div>
             <div class="tab" id="resfiltro-compromiso" onclick="filtrarResultados('compromiso')"><span class="dot" style="background:var(--rojo)"></span>Compromiso</div>
+            <div class="tab" id="resfiltro-casteo" onclick="filtrarResultados('casteo')"><span class="dot" style="background:var(--gold)"></span>Casteo</div>
           </div>
           <div class="panel-head"><div><span class="panel-eyebrow">Captura</span><h2>Resultados de combate</h2></div></div>
           <div class="panel-body">
@@ -1013,11 +1057,28 @@ tr:hover td{background:rgba(212,175,93,0.035);}
     <div class="modal-body">
       <div class="field"><label>Nombre del partido</label><input id="ecNombre"></div>
       <div class="field"><label>Representante</label><input id="ecRepresentante"></div>
-      <div class="field"><label>Fecha del casteo</label><input id="ecFecha" type="date"></div>
+      <div class="field"><label>WhatsApp / Teléfono</label><input id="ecTelefono"></div>
+      <div class="field"><label>Dirección</label><input id="ecDireccion"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" onclick="cerrarModalEditarPartidoCasteo()">Cancelar</button>
       <button class="btn btn-primary" onclick="guardarEdicionPartidoCasteo()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR CASTEO -->
+<div class="modal-overlay" id="modalEditarCasteo">
+  <div class="modal">
+    <div class="modal-head"><h3>Editar casteo</h3><button class="modal-close" onclick="cerrarModalEditarCasteo()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Nombre del Casteo</label><input id="ecsNombre"></div>
+      <div class="field"><label>Fecha del casteo</label><input id="ecsFechaCasteo" type="date"></div>
+      <div class="field"><label>Fecha del evento</label><input id="ecsFechaEvento" type="date"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="cerrarModalEditarCasteo()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarEdicionCasteo()">Guardar cambios</button>
     </div>
   </div>
 </div>
@@ -1028,6 +1089,7 @@ tr:hover td{background:rgba(212,175,93,0.035);}
     <div class="modal-head"><h3>Editar pollo</h3><button class="modal-close" onclick="cerrarModalEditarPollo()">✕</button></div>
     <div class="modal-body">
       <div class="field"><label>Apodo (opcional)</label><input id="epoNombre"></div>
+      <div class="field"><label>Peso (kg, opcional)</label><input id="epoPeso" type="number" step="0.01"></div>
       <div class="field"><label>Anillo</label><input id="epoAnillo"></div>
       <div class="field"><label>Color</label><input id="epoColor"></div>
       <div class="field"><label>Casta</label><input id="epoCasta"></div>
@@ -1270,6 +1332,8 @@ function defaultDB(){
     partidos:[],
     derbys:[],
     derbyActivoId:null,
+    casteos:[],
+    casteoActivoId:null,
     casteoPartidos:[],
     pollos:[],
     nextId:1
@@ -1277,8 +1341,31 @@ function defaultDB(){
 }
 function normalizarDB(){
   if(!DB.usuarios || !DB.usuarios.length) DB.usuarios = defaultDB().usuarios;
+  if(!DB.casteos) DB.casteos = [];
   if(!DB.casteoPartidos) DB.casteoPartidos = [];
+  // migración: partidos de casteo viejos sin casteoId → se agrupan en un casteo genérico
+  if(DB.casteoPartidos.length && DB.casteoPartidos.some(p=>!p.casteoId)){
+    let generico = DB.casteos.find(c=>c.nombre==='Casteo (migrado)');
+    if(!generico){
+      generico = {id:newId(), nombre:'Casteo (migrado)', fechaCasteo:'', fechaEvento:''};
+      DB.casteos.push(generico);
+    }
+    DB.casteoPartidos.forEach(p=>{ if(!p.casteoId) p.casteoId = generico.id; });
+  }
   if(!DB.pollos) DB.pollos = [];
+  // migración: los pollos ahora viven en DB.gallos con origen:'casteo' para poder pelearse de verdad
+  if(DB.pollos.length){
+    DB.pollos.forEach(pollo=>{
+      const cp = DB.casteoPartidos.find(p=>p.id===pollo.partidoCasteoId);
+      DB.gallos.push({
+        id:newId(), origen:'casteo', casteoId: cp?cp.casteoId:null, casteoPartidoId: pollo.partidoCasteoId,
+        partido: pollo.partido, dueno: pollo.dueno, nombre: pollo.nombre,
+        peso: pollo.peso||0, anillo: pollo.anillo, color: pollo.color, casta: pollo.casta, estado:'disponible'
+      });
+    });
+    DB.pollos = [];
+  }
+  if(DB.casteoActivoId===undefined || DB.casteoActivoId===null) DB.casteoActivoId = DB.casteos.length ? DB.casteos[0].id : null;
   if(!DB.peleas) DB.peleas = [];
   if(!DB.partidos) DB.partidos = [];
   if(!DB.derbys){
@@ -1324,7 +1411,7 @@ function toast(msg){
   t.textContent = msg; t.style.display='block';
   clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2400);
 }
-const MODALIDAD_LABEL = {derby:'Derby', rapida:'Rápida', compromiso:'Compromiso'};
+const MODALIDAD_LABEL = {derby:'Derby', rapida:'Rápida', compromiso:'Compromiso', casteo:'Casteo'};
 
 /* ===================== LOGIN ===================== */
 function doLogout(){
@@ -1393,7 +1480,7 @@ function goto(id){
 }
 function switchTab(tab){
   activeTab = tab;
-  ['derby','rapida','compromiso'].forEach(t=>{
+  ['derby','rapida','compromiso','casteo'].forEach(t=>{
     document.getElementById('tab-'+t).classList.toggle('active', t===tab);
     document.getElementById('tabpanel-'+t).classList.toggle('active', t===tab);
   });
@@ -1425,7 +1512,7 @@ function agregarGallo(){
   else toast('Gallo registrado');
   const p = DB.partidos.find(x=>x.nombre.toLowerCase()===partido.toLowerCase());
   if(p){
-    const yaInscritos = DB.gallos.filter(g=>g.partido.toLowerCase()===partido.toLowerCase()).length;
+    const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===partido.toLowerCase()).length;
     if(yaInscritos >= cfg.gallosPorPartido) toast(`${partido} ya tiene su cupo completo (${cfg.gallosPorPartido} gallos)`);
   }
   DB.gallos.push({id:newId(), partido, dueno:dueno||partido, nombre:nombre||'—', peso, anillo, color, casta, estado:'disponible'});
@@ -1477,7 +1564,7 @@ function guardarEdicionGallo(){
 function renderGallos(){
   const q = (document.getElementById('buscarGallo')?.value||'').toLowerCase();
   const wrap = document.getElementById('tablaGallosWrap');
-  let list = DB.gallos.filter(g => !q || (g.partido+g.dueno+g.nombre+g.anillo).toLowerCase().includes(q));
+  let list = DB.gallos.filter(g => g.origen!=='casteo' && (!q || (g.partido+g.dueno+g.nombre+g.anillo).toLowerCase().includes(q)));
   if(!list.length){ wrap.innerHTML = emptyState('Sin gallos registrados','Agrega el primer gallo del Derby arriba.'); return; }
   wrap.innerHTML = `<table><thead><tr>
     <th>Partido</th><th>Dueño</th><th>Nombre</th><th>Peso</th><th>Anillo</th><th>Color</th><th>Casta</th><th>Estado</th><th></th>
@@ -1631,7 +1718,7 @@ function renderDerbysPage(){
   const cupo = derby ? derby.gallosPorPartido : 4;
   if(!partidos.length){ wrap.innerHTML = emptyState('Sin partidos en este derby','Inscribe partidos para este derby desde el Cotejador.'); return; }
   wrap.innerHTML = `<div class="ticket-grid">${partidos.map(p=>{
-    const roster = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length>=cupo;
     return `<div class="panel clickable-card" style="margin-bottom:0;" onclick="abrirDetallePartido(${p.id})">
       <div class="panel-body">
@@ -1650,7 +1737,7 @@ function renderDerbysPage(){
 function abrirDetallePartido(partidoId){
   const p = DB.partidos.find(x=>x.id===partidoId);
   if(!p) return;
-  const roster = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase());
+  const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
   document.getElementById('detallePartidoTitulo').textContent = p.nombre;
   const body = document.getElementById('detallePartidoBody');
   const infoHeader = `<div class="helptext" style="margin-bottom:14px;">Representante: <b style="color:var(--text);">${p.representante}</b></div>`;
@@ -1707,22 +1794,113 @@ function inscribirPartidoGeneral(){
 }
 
 /* ===================== CASTEO DE POLLOS ===================== */
+/* ===================== CASTEOS (evento) ===================== */
+function crearCasteo(){
+  const nombre = document.getElementById('csNombre').value.trim();
+  const fechaCasteo = document.getElementById('csFechaCasteo').value;
+  const fechaEvento = document.getElementById('csFechaEvento').value;
+  if(!nombre){ toast('Falta el nombre del casteo'); return; }
+  const nuevoId = newId();
+  DB.casteos.push({id:nuevoId, nombre, fechaCasteo, fechaEvento});
+  if(!DB.casteoActivoId) DB.casteoActivoId = nuevoId;
+  saveDB();
+  ['csNombre','csFechaCasteo','csFechaEvento'].forEach(id=>document.getElementById(id).value='');
+  toast('Casteo creado');
+  renderAll();
+}
+function activarCasteo(id){
+  DB.casteoActivoId = id;
+  saveDB();
+  toast('Casteo activado en el Cotejador');
+  renderAll();
+}
+function borrarCasteo(id){
+  confirmarAccion('¿Borrar este casteo? Los partidos y pollos registrados en él también se borran.', ()=>{
+    const partidosDelCasteo = DB.casteoPartidos.filter(p=>p.casteoId===id).map(p=>p.id);
+    DB.gallos = DB.gallos.filter(g=>!(g.origen==='casteo' && partidosDelCasteo.includes(g.casteoPartidoId)));
+    DB.peleas = DB.peleas.filter(c=>c.casteoId!==id);
+    DB.casteoPartidos = DB.casteoPartidos.filter(p=>p.casteoId!==id);
+    DB.casteos = DB.casteos.filter(c=>c.id!==id);
+    if(DB.casteoActivoId===id) DB.casteoActivoId = DB.casteos.length ? DB.casteos[0].id : null;
+    saveDB(); renderAll();
+    toast('Casteo eliminado');
+  });
+}
+let editCasteoTarget = null;
+function abrirEditarCasteo(id){
+  const c = DB.casteos.find(x=>x.id===id);
+  if(!c) return;
+  editCasteoTarget = id;
+  document.getElementById('ecsNombre').value = c.nombre;
+  document.getElementById('ecsFechaCasteo').value = c.fechaCasteo||'';
+  document.getElementById('ecsFechaEvento').value = c.fechaEvento||'';
+  document.getElementById('modalEditarCasteo').classList.add('active');
+}
+function cerrarModalEditarCasteo(){ document.getElementById('modalEditarCasteo').classList.remove('active'); editCasteoTarget=null; }
+function guardarEdicionCasteo(){
+  const c = DB.casteos.find(x=>x.id===editCasteoTarget);
+  if(!c) return;
+  const nombre = document.getElementById('ecsNombre').value.trim();
+  if(!nombre){ toast('Falta el nombre del casteo'); return; }
+  c.nombre = nombre;
+  c.fechaCasteo = document.getElementById('ecsFechaCasteo').value;
+  c.fechaEvento = document.getElementById('ecsFechaEvento').value;
+  saveDB();
+  cerrarModalEditarCasteo();
+  toast('Casteo actualizado');
+  renderAll();
+}
+function renderCasteosList(){
+  const wrap = document.getElementById('casteosListWrap');
+  if(!wrap) return;
+  if(!DB.casteos.length){ wrap.innerHTML = emptyState('Sin casteos creados','Crea el primero arriba para poder inscribir partidos.'); return; }
+  wrap.innerHTML = `<table><thead><tr><th>Casteo</th><th>Fecha de casteo</th><th>Fecha del evento</th><th>Partidos</th><th>Estado</th><th></th></tr></thead><tbody>
+    ${DB.casteos.map(c=>{
+      const n = DB.casteoPartidos.filter(p=>p.casteoId===c.id).length;
+      const activo = c.id===DB.casteoActivoId;
+      return `<tr>
+        <td><b style="color:var(--verde)">${c.nombre}</b></td>
+        <td>${c.fechaCasteo||'—'}</td>
+        <td>${c.fechaEvento||'—'}</td>
+        <td>${n}</td>
+        <td>${activo?'<span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>Activo</span>':'<span class="badge badge-off">Inactivo</span>'}</td>
+        <td class="row-actions">
+          ${!activo?`<button class="btn btn-ghost btn-sm" onclick="activarCasteo(${c.id})">Activar</button>`:''}
+          <button class="icon-btn" onclick="abrirEditarCasteo(${c.id})" title="Editar">✎</button>
+          <button class="icon-btn" onclick="borrarCasteo(${c.id})" title="Borrar">✕</button>
+        </td>
+      </tr>`;
+    }).join('')}
+  </tbody></table>`;
+}
+function populateCasteoSelect(){
+  const sel = document.getElementById('ctCasteoSelect');
+  if(!sel) return;
+  const actual = sel.value;
+  if(!DB.casteos.length){ sel.innerHTML = '<option value="">— crea un casteo primero —</option>'; return; }
+  sel.innerHTML = DB.casteos.map(c=>`<option value="${c.id}" ${String(c.id)===actual?'selected':''}>${c.nombre}${c.fechaEvento?' (pelean '+c.fechaEvento+')':''}</option>`).join('');
+}
 function inscribirPartidoCasteo(){
+  const casteoId = parseInt(document.getElementById('ctCasteoSelect').value);
   const nombre = document.getElementById('ctNombre').value.trim();
   const representante = document.getElementById('ctRepresentante').value.trim();
-  const fecha = document.getElementById('ctFecha').value;
+  const telefono = document.getElementById('ctTelefono').value.trim();
+  const direccion = document.getElementById('ctDireccion').value.trim();
+  if(!casteoId){ toast('Primero crea un casteo arriba'); return; }
   if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
-  if(DB.casteoPartidos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase())){ toast('Ese partido ya está inscrito en el casteo'); return; }
-  DB.casteoPartidos.push({id:newId(), nombre, representante, fecha});
+  if(DB.casteoPartidos.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase() && p.casteoId===casteoId)){ toast('Ese partido ya está inscrito en este casteo'); return; }
+  DB.casteoPartidos.push({id:newId(), casteoId, nombre, representante, telefono, direccion});
   saveDB();
-  document.getElementById('ctNombre').value=''; document.getElementById('ctRepresentante').value='';
+  ['ctNombre','ctRepresentante','ctTelefono','ctDireccion'].forEach(id=>document.getElementById(id).value='');
   toast('Partido de casteo inscrito');
   renderAll();
 }
 function borrarPartidoCasteo(id){
   confirmarAccion('¿Quitar este partido del casteo? También se borran sus pollos registrados.', ()=>{
     DB.casteoPartidos = DB.casteoPartidos.filter(p=>p.id!==id);
-    DB.pollos = DB.pollos.filter(g=>g.partidoCasteoId!==id);
+    const idsPollos = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===id).map(g=>g.id);
+    DB.gallos = DB.gallos.filter(g=>!(g.origen==='casteo' && g.casteoPartidoId===id));
+    DB.peleas = DB.peleas.filter(c=>!idsPollos.includes(c.rojo) && !idsPollos.includes(c.verde));
     saveDB(); renderAll();
     toast('Partido de casteo eliminado');
   });
@@ -1734,7 +1912,8 @@ function abrirEditarPartidoCasteo(id){
   editPartidoCasteoTarget = id;
   document.getElementById('ecNombre').value = p.nombre;
   document.getElementById('ecRepresentante').value = p.representante;
-  document.getElementById('ecFecha').value = p.fecha||'';
+  document.getElementById('ecTelefono').value = p.telefono||'';
+  document.getElementById('ecDireccion').value = p.direccion||'';
   document.getElementById('modalEditarPartidoCasteo').classList.add('active');
 }
 function cerrarModalEditarPartidoCasteo(){ document.getElementById('modalEditarPartidoCasteo').classList.remove('active'); editPartidoCasteoTarget=null; }
@@ -1747,9 +1926,10 @@ function guardarEdicionPartidoCasteo(){
   const nombreAnterior = p.nombre;
   p.nombre = nombre;
   p.representante = representante;
-  p.fecha = document.getElementById('ecFecha').value;
+  p.telefono = document.getElementById('ecTelefono').value.trim();
+  p.direccion = document.getElementById('ecDireccion').value.trim();
   if(nombreAnterior.toLowerCase()!==nombre.toLowerCase()){
-    DB.pollos.forEach(g=>{ if(g.partidoCasteoId===p.id) g.partido = nombre; });
+    DB.gallos.forEach(g=>{ if(g.origen==='casteo' && g.casteoPartidoId===p.id) g.partido = nombre; });
   }
   saveDB();
   cerrarModalEditarPartidoCasteo();
@@ -1760,29 +1940,32 @@ function agregarPollo(partidoCasteoId){
   const p = DB.casteoPartidos.find(x=>x.id===partidoCasteoId);
   if(!p) return;
   const nombre = document.getElementById('pc_nombre_'+partidoCasteoId).value.trim();
+  const peso = parseFloat(document.getElementById('pc_peso_'+partidoCasteoId).value) || 0;
   const anillo = document.getElementById('pc_anillo_'+partidoCasteoId).value.trim();
   const color = document.getElementById('pc_color_'+partidoCasteoId).value.trim();
   const casta = document.getElementById('pc_casta_'+partidoCasteoId).value.trim();
   if(!anillo){ toast('Falta el número de anillo'); return; }
-  if(DB.pollos.some(g=>g.anillo && g.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay un pollo anillado con ese número'); return; }
-  DB.pollos.push({id:newId(), partidoCasteoId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', anillo, color, casta, fecha:p.fecha||''});
+  if(DB.gallos.some(g=>g.origen==='casteo' && g.anillo && g.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay un pollo anillado con ese número'); return; }
+  DB.gallos.push({id:newId(), origen:'casteo', casteoId:p.casteoId, casteoPartidoId:partidoCasteoId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', peso, anillo, color, casta, estado:'disponible'});
   saveDB();
   toast('Pollo registrado');
   renderAll();
 }
 function borrarPollo(id){
   confirmarAccion('¿Quitar este pollo del casteo?', ()=>{
-    DB.pollos = DB.pollos.filter(g=>g.id!==id);
+    DB.gallos = DB.gallos.filter(g=>g.id!==id);
+    DB.peleas = DB.peleas.filter(c=>c.rojo!==id && c.verde!==id);
     saveDB(); renderAll();
     toast('Pollo eliminado');
   });
 }
 let editPolloTarget = null;
 function abrirEditarPollo(id){
-  const g = DB.pollos.find(x=>x.id===id);
+  const g = DB.gallos.find(x=>x.id===id && x.origen==='casteo');
   if(!g) return;
   editPolloTarget = id;
   document.getElementById('epoNombre').value = g.nombre;
+  document.getElementById('epoPeso').value = g.peso||'';
   document.getElementById('epoAnillo').value = g.anillo||'';
   document.getElementById('epoColor').value = g.color||'';
   document.getElementById('epoCasta').value = g.casta||'';
@@ -1790,12 +1973,13 @@ function abrirEditarPollo(id){
 }
 function cerrarModalEditarPollo(){ document.getElementById('modalEditarPollo').classList.remove('active'); editPolloTarget=null; }
 function guardarEdicionPollo(){
-  const g = DB.pollos.find(x=>x.id===editPolloTarget);
+  const g = DB.gallos.find(x=>x.id===editPolloTarget);
   if(!g) return;
   const anillo = document.getElementById('epoAnillo').value.trim();
   if(!anillo){ toast('Falta el número de anillo'); return; }
-  if(DB.pollos.some(x=>x.id!==g.id && x.anillo && x.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay otro pollo con ese anillo'); return; }
+  if(DB.gallos.some(x=>x.id!==g.id && x.origen==='casteo' && x.anillo && x.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay otro pollo con ese anillo'); return; }
   g.nombre = document.getElementById('epoNombre').value.trim() || '—';
+  g.peso = parseFloat(document.getElementById('epoPeso').value) || 0;
   g.anillo = anillo;
   g.color = document.getElementById('epoColor').value.trim();
   g.casta = document.getElementById('epoCasta').value.trim();
@@ -1810,10 +1994,13 @@ function renderCasteoPartidos(){
   if(!DB.casteoPartidos.length){ wrap.innerHTML = emptyState('Sin partidos en el casteo','Inscribe el primer partido arriba para empezar a anillar pollos.'); return; }
   const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
   wrap.innerHTML = DB.casteoPartidos.map(p=>{
-    const roster = DB.pollos.filter(g=>g.partidoCasteoId===p.id);
+    const roster = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===p.id);
+    const casteo = DB.casteos.find(c=>c.id===p.casteoId);
     return `<div class="panel" style="margin-bottom:12px;">
       <div class="panel-head">
-        <div><span class="panel-eyebrow">Rep. ${p.representante}${p.fecha?' · '+p.fecha:''}</span><h2 style="font-size:19px;">${p.nombre}</h2></div>
+        <div><span class="panel-eyebrow">${casteo?casteo.nombre:'Sin casteo'} · Rep. ${p.representante}</span><h2 style="font-size:19px;">${p.nombre}</h2>
+          <div class="helptext" style="margin-top:2px;">${p.telefono?'📱 '+p.telefono:'Sin WhatsApp'}${p.direccion?' · 📍 '+p.direccion:''}</div>
+        </div>
         <div class="panel-actions">
           <span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>${roster.length} pollo${roster.length===1?'':'s'}</span>
           <button class="icon-btn" onclick="imprimirHojaCasteo(${p.id})" title="Imprimir hoja de este partido">🖶</button>
@@ -1822,8 +2009,9 @@ function renderCasteoPartidos(){
         </div>
       </div>
       <div class="panel-body">
-        <div class="form-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:8px;">
+        <div class="form-grid" style="grid-template-columns:1.1fr 1fr 1fr 1fr 1fr auto;gap:8px;">
           <input id="pc_nombre_${p.id}" placeholder="Apodo (opcional)" style="${inputStyle}">
+          <input id="pc_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg (opc.)" style="${inputStyle}">
           <input id="pc_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
           <input id="pc_color_${p.id}" placeholder="Color" style="${inputStyle}">
           <input id="pc_casta_${p.id}" placeholder="Casta" style="${inputStyle}">
@@ -1831,9 +2019,63 @@ function renderCasteoPartidos(){
         </div>
         ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
-            <span>${g.nombre} <span style="color:var(--text-muted);">— Anillo #${g.anillo}${g.color?' · '+g.color:''}${g.casta?' · '+g.casta:''}</span></span>
+            <span>${g.nombre} <span style="color:var(--text-muted);">— Anillo #${g.anillo}${g.peso?' · '+g.peso.toFixed(2)+'kg':''}${g.color?' · '+g.color:''}${g.casta?' · '+g.casta:''}</span></span>
             <span style="display:flex;align-items:center;gap:8px;">
+              ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
               <button class="icon-btn" onclick="abrirEditarPollo(${g.id})" title="Editar pollo">✎</button>
+              <button class="icon-btn" onclick="borrarPollo(${g.id})" title="Quitar pollo">✕</button>
+            </span>
+          </div>`).join('')}</div>` : `<div class="helptext">Aún sin pollos registrados en este partido.</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+function agregarPolloCotejador(partidoCasteoId){
+  const p = DB.casteoPartidos.find(x=>x.id===partidoCasteoId);
+  if(!p) return;
+  const nombre = document.getElementById('ctgc_nombre_'+partidoCasteoId).value.trim();
+  const peso = parseFloat(document.getElementById('ctgc_peso_'+partidoCasteoId).value) || 0;
+  const anillo = document.getElementById('ctgc_anillo_'+partidoCasteoId).value.trim();
+  const color = document.getElementById('ctgc_color_'+partidoCasteoId).value.trim();
+  const casta = document.getElementById('ctgc_casta_'+partidoCasteoId).value.trim();
+  if(!anillo){ toast('Falta el número de anillo'); return; }
+  if(DB.gallos.some(g=>g.origen==='casteo' && g.anillo && g.anillo.toLowerCase()===anillo.toLowerCase())){ toast('Ya hay un pollo anillado con ese número'); return; }
+  DB.gallos.push({id:newId(), origen:'casteo', casteoId:p.casteoId, casteoPartidoId:partidoCasteoId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', peso, anillo, color, casta, estado:'disponible'});
+  saveDB();
+  toast('Pollo registrado');
+  renderAll();
+}
+function renderCasteoCotejadorCards(){
+  const wrap = document.getElementById('casteoCotejadorCardsWrap');
+  const info = document.getElementById('casteoTabActivoInfo');
+  if(!wrap) return;
+  const casteo = DB.casteos.find(c=>c.id===DB.casteoActivoId);
+  if(info) info.textContent = casteo ? `Casteo activo: ${casteo.nombre}${casteo.fechaEvento?' · pelean el '+casteo.fechaEvento:''}` : 'No hay un casteo activo. Créalo y actívalo en la sección Casteo de Pollos.';
+  if(!casteo){ wrap.innerHTML = emptyState('Sin casteo activo','Ve a Casteo de Pollos, crea uno y actívalo para poder correr sus peleas aquí.'); return; }
+  const partidosDelCasteo = DB.casteoPartidos.filter(p=>p.casteoId===casteo.id);
+  if(!partidosDelCasteo.length){ wrap.innerHTML = emptyState('Sin partidos en este casteo','Inscribe partidos en la sección Casteo de Pollos.'); return; }
+  const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
+  wrap.innerHTML = partidosDelCasteo.map(p=>{
+    const roster = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===p.id);
+    return `<div class="panel" style="margin-bottom:12px;">
+      <div class="panel-head">
+        <div><span class="panel-eyebrow">Rep. ${p.representante}</span><h2 style="font-size:19px;">${p.nombre}</h2></div>
+        <div class="panel-actions"><span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>${roster.length} pollo${roster.length===1?'':'s'}</span></div>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid" style="grid-template-columns:1.1fr 1fr 1fr 1fr 1fr auto;gap:8px;">
+          <input id="ctgc_nombre_${p.id}" placeholder="Apodo (opcional)" style="${inputStyle}">
+          <input id="ctgc_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg" style="${inputStyle}">
+          <input id="ctgc_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
+          <input id="ctgc_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <input id="ctgc_casta_${p.id}" placeholder="Casta" style="${inputStyle}">
+          <button class="btn btn-primary btn-sm" onclick="agregarPolloCotejador(${p.id})">+ Agregar</button>
+        </div>
+        ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
+            <span>${g.nombre} <span style="color:var(--text-muted);">— Anillo #${g.anillo}${g.peso?' · '+g.peso.toFixed(2)+'kg':''}${g.color?' · '+g.color:''}</span></span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
               <button class="icon-btn" onclick="borrarPollo(${g.id})" title="Quitar pollo">✕</button>
             </span>
           </div>`).join('')}</div>` : `<div class="helptext">Aún sin pollos registrados en este partido.</div>`}
@@ -1844,7 +2086,8 @@ function renderCasteoPartidos(){
 function imprimirHojaCasteo(partidoCasteoId){
   const p = DB.casteoPartidos.find(x=>x.id===partidoCasteoId);
   if(!p) return;
-  const roster = DB.pollos.filter(g=>g.partidoCasteoId===partidoCasteoId);
+  const casteo = DB.casteos.find(c=>c.id===p.casteoId);
+  const roster = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===partidoCasteoId);
   const w = window.open('', '_blank', 'width=650,height=800');
   w.document.write(`
     <html><head><title>Hoja de Casteo - ${p.nombre}</title>
@@ -1852,14 +2095,16 @@ function imprimirHojaCasteo(partidoCasteoId){
       body{font-family:'Courier New',monospace;padding:26px;color:#111;}
       h1{font-size:21px;margin-bottom:2px;letter-spacing:1px;}
       .sub{font-size:11px;color:#555;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase;}
-      .folio{font-size:13px;font-weight:bold;margin-top:14px;margin-bottom:16px;border:1px solid #111;display:inline-block;padding:4px 10px;}
+      .folio{font-size:13px;font-weight:bold;margin-top:14px;margin-bottom:6px;border:1px solid #111;display:inline-block;padding:4px 10px;}
+      .contacto{font-size:11px;color:#333;margin-bottom:16px;}
       table{width:100%;border-collapse:collapse;}
       th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 4px;border-bottom:1px solid #111;}
       td{padding:7px 4px;font-size:12.5px;border-bottom:1px solid #ccc;}
     </style></head><body>
     <h1>PUESTOS 15 · Hoja de Casteo</h1>
-    <div class="sub">${DB.torneo.nombre||''} ${DB.torneo.sede?'· '+DB.torneo.sede:''}</div>
-    <div class="folio">${p.nombre} · Rep. ${p.representante}${p.fecha?' · '+p.fecha:''} · ${roster.length} pollos</div>
+    <div class="sub">${casteo?casteo.nombre:''} ${casteo&&casteo.fechaCasteo?'· Casteo: '+casteo.fechaCasteo:''} ${casteo&&casteo.fechaEvento?'· Pelean: '+casteo.fechaEvento:''}</div>
+    <div class="folio">${p.nombre} · Rep. ${p.representante} · ${roster.length} pollos</div>
+    <div class="contacto">${p.telefono?'📱 '+p.telefono+' ':''}${p.direccion?'📍 '+p.direccion:''}</div>
     <table><tr><th>#</th><th>Apodo</th><th>Anillo</th><th>Color</th><th>Casta</th></tr>
       ${roster.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nombre}</td><td>#${g.anillo}</td><td>${g.color||'—'}</td><td>${g.casta||'—'}</td></tr>`).join('')}
     </table>
@@ -1871,8 +2116,8 @@ function imprimirHojaCasteoCompleta(){
   if(!DB.casteoPartidos.length){ toast('No hay partidos de casteo registrados'); return; }
   const w = window.open('', '_blank', 'width=650,height=800');
   const bloques = DB.casteoPartidos.map(p=>{
-    const roster = DB.pollos.filter(g=>g.partidoCasteoId===p.id);
-    return `<div class="folio">${p.nombre} · Rep. ${p.representante}${p.fecha?' · '+p.fecha:''} · ${roster.length} pollos</div>
+    const roster = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===p.id);
+    return `<div class="folio">${p.nombre} · Rep. ${p.representante} · ${roster.length} pollos</div>
       <table><tr><th>#</th><th>Apodo</th><th>Anillo</th><th>Color</th><th>Casta</th></tr>
         ${roster.map((g,i)=>`<tr><td>${i+1}</td><td>${g.nombre}</td><td>#${g.anillo}</td><td>${g.color||'—'}</td><td>${g.casta||'—'}</td></tr>`).join('')}
       </table>`;
@@ -1897,7 +2142,7 @@ function imprimirHojaCasteoCompleta(){
 }
 function buscarPolloPorAnillo(anillo){
   if(!anillo) return null;
-  return DB.pollos.find(g=>g.anillo && g.anillo.toLowerCase()===anillo.trim().toLowerCase()) || null;
+  return DB.gallos.find(g=>g.origen==='casteo' && g.anillo && g.anillo.toLowerCase()===anillo.trim().toLowerCase()) || null;
 }
 function verificarAnilloEnCasteo(anilloInputId, partidoNombre){
   const anillo = document.getElementById(anilloInputId).value.trim();
@@ -1939,7 +2184,7 @@ function guardarEdicionPartido(){
   p.representante = representante;
   p.telefono = document.getElementById('epTelefono').value.trim();
   if(nombreAnterior.toLowerCase() !== nombre.toLowerCase()){
-    DB.gallos.forEach(g=>{ if(g.partido.toLowerCase()===nombreAnterior.toLowerCase()) g.partido = nombre; });
+    DB.gallos.forEach(g=>{ if(g.origen!=='casteo' && g.partido.toLowerCase()===nombreAnterior.toLowerCase()) g.partido = nombre; });
     DB.excepciones.forEach(e=>{
       if(e.a.toLowerCase()===nombreAnterior.toLowerCase()) e.a = nombre;
       if(e.b.toLowerCase()===nombreAnterior.toLowerCase()) e.b = nombre;
@@ -1962,7 +2207,7 @@ function agregarGalloAPartido(partidoId){
   const color = document.getElementById('pg_color_'+partidoId).value.trim();
   if(!peso){ toast('Falta el peso del gallo'); return; }
   const cfg = derbyDeGallo(p);
-  const yaInscritos = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
+  const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
   if(cfg.pesoMin && peso < cfg.pesoMin) toast(`Aviso: ${peso}kg está por debajo del mínimo (${cfg.pesoMin}kg)`);
   else if(cfg.pesoMax && peso > cfg.pesoMax) toast(`Aviso: ${peso}kg está por encima del máximo (${cfg.pesoMax}kg)`);
   else if(yaInscritos >= cfg.gallosPorPartido) toast(`${p.nombre} ya completó su cupo de ${cfg.gallosPorPartido}`);
@@ -1979,7 +2224,7 @@ function renderPartidos(){
   if(!partidosDelDerby.length){ wrap.innerHTML = emptyState('Sin partidos inscritos','Inscribe el primer partido con su representante para empezar a darle de alta sus gallos.'); renderSorteoStatus(); return; }
   const cupo = activeDerby().gallosPorPartido || 4;
   wrap.innerHTML = partidosDelDerby.map(p=>{
-    const roster = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length >= cupo;
     const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
     return `<div class="panel" style="margin-bottom:12px;">
@@ -2002,7 +2247,7 @@ function renderPartidos(){
         </div>
         ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
-            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span></span>
+            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span>${g.peso===0?' <span class="badge badge-pend" style="color:var(--rojo);">⚠ Falta peso</span>':''}</span>
             <span style="display:flex;align-items:center;gap:8px;">
               ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
               <button class="icon-btn" onclick="abrirEditarGallo(${g.id})" title="Editar gallo">✎</button>
@@ -2022,7 +2267,7 @@ function renderPartidosGeneral(){
   wrap.innerHTML = DB.partidos.map(p=>{
     const cfg = derbyDeGallo(p);
     const cupo = cfg.gallosPorPartido || 4;
-    const roster = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length >= cupo;
     return `<div class="panel" style="margin-bottom:12px;">
       <div class="panel-head">
@@ -2044,7 +2289,7 @@ function renderPartidosGeneral(){
         </div>
         ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
-            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span></span>
+            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span>${g.peso===0?' <span class="badge badge-pend" style="color:var(--rojo);">⚠ Falta peso</span>':''}</span>
             <span style="display:flex;align-items:center;gap:8px;">
               ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
               <button class="icon-btn" onclick="abrirEditarGallo(${g.id})" title="Editar gallo">✎</button>
@@ -2064,7 +2309,7 @@ function agregarGalloAPartidoGeneral(partidoId){
   const color = document.getElementById('pgg_color_'+partidoId).value.trim();
   if(!peso){ toast('Falta el peso del gallo'); return; }
   const cfg = derbyDeGallo(p);
-  const yaInscritos = DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
+  const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
   if(cfg.pesoMin && peso < cfg.pesoMin) toast(`Aviso: ${peso}kg está por debajo del mínimo (${cfg.pesoMin}kg)`);
   else if(cfg.pesoMax && peso > cfg.pesoMax) toast(`Aviso: ${peso}kg está por encima del máximo (${cfg.pesoMax}kg)`);
   else if(yaInscritos >= cfg.gallosPorPartido) toast(`${p.nombre} ya completó su cupo de ${cfg.gallosPorPartido}`);
@@ -2080,13 +2325,40 @@ function renderSorteoStatus(){
   const cfg = activeDerby();
   const partidosDelDerby = DB.partidos.filter(p=>p.derbyId===DB.derbyActivoId);
   const cupo = cfg.gallosPorPartido || 4;
-  const completos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase()).length >= cupo).length;
+  const completos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length >= cupo).length;
   const disponibles = DB.gallos.filter(g=>g.estado==='disponible').length;
   el.textContent = `Derby activo: ${cfg.nombre} · ${partidosDelDerby.length} partido(s) inscrito(s) · ${completos} completo(s) · ${disponibles} gallo(s) disponibles para el sorteo · tolerancia ${cfg.tolerancia||80} g`;
 }
 function populatePartidosDatalist(){
   const dl = document.getElementById('partidosList');
   if(dl) dl.innerHTML = DB.partidos.map(p=>`<option value="${p.nombre}">`).join('');
+  const dl2 = document.getElementById('casteoPartidosList');
+  if(dl2) dl2.innerHTML = DB.casteoPartidos.map(p=>`<option value="${p.nombre}">`).join('');
+}
+function importarPartidoCasteado(){
+  const nombre = document.getElementById('importCasteoInput').value.trim();
+  if(!nombre){ toast('Escribe el nombre del partido casteado'); return; }
+  if(!DB.derbyActivoId){ toast('Primero activa un derby en Configuración'); return; }
+  const cp = DB.casteoPartidos.find(x=>x.nombre.toLowerCase()===nombre.toLowerCase());
+  if(!cp){ toast('No encontré ese partido en el Casteo'); return; }
+  const pollos = DB.gallos.filter(g=>g.origen==='casteo' && g.casteoPartidoId===cp.id);
+  if(!pollos.length){ toast('Ese partido no tiene pollos registrados en el Casteo'); return; }
+  let partidoDerby = DB.partidos.find(p=>p.nombre.toLowerCase()===cp.nombre.toLowerCase() && p.derbyId===DB.derbyActivoId);
+  if(!partidoDerby){
+    partidoDerby = {id:newId(), nombre:cp.nombre, representante:cp.representante, telefono:cp.telefono||'', derbyId:DB.derbyActivoId};
+    DB.partidos.push(partidoDerby);
+  }
+  let importados = 0;
+  pollos.forEach(pollo=>{
+    const yaExiste = DB.gallos.some(g=>g.origen!=='casteo' && g.anillo && pollo.anillo && g.anillo.toLowerCase()===pollo.anillo.toLowerCase() && g.partido.toLowerCase()===cp.nombre.toLowerCase());
+    if(yaExiste) return;
+    DB.gallos.push({id:newId(), partido:cp.nombre, dueno:cp.representante, nombre:pollo.nombre, peso:pollo.peso||0, anillo:pollo.anillo, color:pollo.color, casta:pollo.casta, estado:'disponible'});
+    importados++;
+  });
+  saveDB();
+  document.getElementById('importCasteoInput').value='';
+  toast(`${importados} gallo(s) importado(s) de "${cp.nombre}" — recuerda pesarlos antes del sorteo`);
+  renderAll();
 }
 
 /* ===================== COTEJO (algoritmo) ===================== */
@@ -2096,13 +2368,18 @@ function cotejarAutomatico(tipo){
     const cupo = cfg.gallosPorPartido || 4;
     const partidosDelDerby = DB.partidos.filter(p=>p.derbyId===DB.derbyActivoId);
     if(!partidosDelDerby.length){ toast('Primero inscribe partidos en este derby'); return; }
-    const incompletos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.partido.toLowerCase()===p.nombre.toLowerCase()).length < cupo);
+    const incompletos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length < cupo);
     if(incompletos.length){ toast(`Faltan gallos por registrar en: ${incompletos.map(p=>p.nombre).join(', ')}`); return; }
   }
-  const tolG = tipo==='derby' ? (activeDerby().tolerancia||80) : (parseFloat(document.getElementById('tolRapida').value) || 80);
+  if(tipo==='casteo' && !DB.casteoActivoId){ toast('Primero crea y activa un casteo'); return; }
+  const tolG = tipo==='derby' ? (activeDerby().tolerancia||80) : tipo==='casteo' ? (parseFloat(document.getElementById('tolCasteo').value) || 200) : (parseFloat(document.getElementById('tolRapida').value) || 80);
   const tolKg = tolG/1000;
   const ronda = tipo==='derby' ? (parseInt(document.getElementById('rondaDerby').value)||1) : null;
-  let disponibles = DB.gallos.filter(g=>g.estado==='disponible').sort((a,b)=>a.peso-b.peso);
+  let disponibles = DB.gallos.filter(g=>{
+    if(g.estado!=='disponible') return false;
+    if(tipo==='casteo') return g.origen==='casteo' && g.casteoId===DB.casteoActivoId;
+    return g.origen!=='casteo';
+  }).sort((a,b)=>a.peso-b.peso);
   let armados = 0;
   let usados = new Set();
 
@@ -2122,7 +2399,7 @@ function cotejarAutomatico(tipo){
     if(mejor){
       usados.add(g1.id); usados.add(mejor.id);
       const numero = DB.peleas.length + 1;
-      DB.peleas.push({id:newId(), numero, tipo, rojo:g1.id, verde:mejor.id, diff:mejorDiff, estado:'pendiente', resultado:null, notas:'', ronda});
+      DB.peleas.push({id:newId(), numero, tipo, rojo:g1.id, verde:mejor.id, diff:mejorDiff, estado:'pendiente', resultado:null, notas:'', ronda, casteoId:tipo==='casteo'?DB.casteoActivoId:null});
       const rg1 = DB.gallos.find(g=>g.id===g1.id); rg1.estado='cotejado';
       const rg2 = DB.gallos.find(g=>g.id===mejor.id); rg2.estado='cotejado';
       armados++;
@@ -2133,7 +2410,7 @@ function cotejarAutomatico(tipo){
   renderAll();
 }
 function fillCompromisoSelects(){
-  const disp = DB.gallos.filter(g=>g.estado==='disponible');
+  const disp = DB.gallos.filter(g=>g.estado==='disponible' && g.origen!=='casteo');
   const opts = '<option value="">— selecciona —</option>' + disp.map(g=>`<option value="${g.id}">${g.nombre} · ${g.partido} · ${g.peso.toFixed(2)}kg</option>`).join('');
   document.getElementById('compRojo').innerHTML = opts;
   document.getElementById('compVerde').innerHTML = opts;
@@ -2646,7 +2923,7 @@ function renderResultados(){
 }
 function filtrarResultados(tipo){
   window.resultadosFiltro = tipo;
-  ['todas','derby','rapida','compromiso'].forEach(t=>{
+  ['todas','derby','rapida','compromiso','casteo'].forEach(t=>{
     document.getElementById('resfiltro-'+t).classList.toggle('active', t===tipo);
   });
   renderResultados();
@@ -2796,10 +3073,10 @@ function exportarExcel(){
 
 /* ===================== DASHBOARD ===================== */
 function renderDashboard(){
-  document.getElementById('statGallos').innerHTML = DB.gallos.length;
+  document.getElementById('statGallos').innerHTML = DB.gallos.filter(g=>g.origen!=='casteo').length;
   document.getElementById('statCotejos').innerHTML = DB.peleas.length;
   document.getElementById('statCerradas').innerHTML = DB.peleas.filter(c=>c.estado==='finalizado').length;
-  document.getElementById('statSueltos').innerHTML = DB.gallos.filter(g=>g.estado==='disponible').length;
+  document.getElementById('statSueltos').innerHTML = DB.gallos.filter(g=>g.estado==='disponible' && g.origen!=='casteo').length;
   document.getElementById('chipDerby').textContent = DB.peleas.filter(c=>c.tipo==='derby').length;
   document.getElementById('chipRapida').textContent = DB.peleas.filter(c=>c.tipo==='rapida').length;
   document.getElementById('chipCompromiso').textContent = DB.peleas.filter(c=>c.tipo==='compromiso').length;
@@ -2848,6 +3125,9 @@ function renderAll(){
   renderPartidos();
   renderPartidosGeneral();
   renderCasteoPartidos();
+  renderCasteosList();
+  renderCasteoCotejadorCards();
+  populateCasteoSelect();
   populateDerbySelectGeneral();
   populatePartidosDatalist();
   renderDerbysPage();
