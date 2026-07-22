@@ -779,23 +779,55 @@ tr:hover td{background:rgba(212,175,93,0.035);}
           <!-- RAPIDA TAB -->
           <div class="tab-panel" id="tabpanel-rapida">
             <div class="panel-body">
-              <p class="helptext" style="margin-bottom:16px;">Peleas sueltas, rápidas: cotejo inmediato por peso más cercano, sin llevar puntaje de derby. Ideal para frentes libres o de última hora.</p>
-              <div class="form-grid" style="margin-bottom:16px;">
-                <div class="field"><label>Tolerancia de peso (g)</label><input id="tolRapida" type="number" value="80"></div>
+              <p class="helptext" style="margin-bottom:16px;">Peleas sueltas y rápidas: cada partido mete los gallos que traiga (uno, dos, los que sean), y cotejas por peso a los que haya — sin llevar puntaje de derby ni pedir cupo completo.</p>
+
+              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;margin-bottom:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Inscribir partido</div>
+                <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+                  <div class="field"><label>Nombre del partido</label><input id="prNombre" placeholder="Ej. Gallera El Progreso"></div>
+                  <div class="field"><label>Representante</label><input id="prRepresentante" placeholder="Nombre del representante"></div>
+                  <div class="field"><label>WhatsApp</label><input id="prTelefono" placeholder="Ej. 9181234567"></div>
+                  <button class="btn btn-primary" onclick="inscribirPartidoRapida()">+ Inscribir partido</button>
+                </div>
               </div>
-              <button class="btn btn-gold" onclick="cotejarAutomatico('rapida')">⚡ Cotejar peleas rápidas</button>
+
+              <div id="partidosRapidaCardsWrap" style="margin-bottom:20px;"></div>
+
+              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Sorteo</div>
+                <div class="form-grid" style="margin-bottom:14px;max-width:220px;">
+                  <div class="field"><label>Tolerancia de peso (g)</label><input id="tolRapida" type="number" value="80"></div>
+                </div>
+                <button class="btn btn-gold" onclick="cotejarAutomatico('rapida')">⚡ Cotejar peleas rápidas</button>
+              </div>
             </div>
           </div>
 
           <!-- COMPROMISO TAB -->
           <div class="tab-panel" id="tabpanel-compromiso">
             <div class="panel-body">
-              <p class="helptext" style="margin-bottom:16px;">Pelea arreglada directamente entre dos dueños: tú eliges manualmente el gallo del lado rojo y el del lado verde, sin importar el peso.</p>
-              <div class="form-grid">
-                <div class="field"><label>Lado Rojo</label><select id="compRojo"></select></div>
-                <div class="field"><label>Lado Verde</label><select id="compVerde"></select></div>
+              <p class="helptext" style="margin-bottom:16px;">Pelea arreglada directamente entre dos dueños. Normalmente son gallos de <b>1.9 kg a 2.8 kg</b> — depende de qué gallos metan. Tú eliges manualmente el lado rojo y el lado verde, sin importar el peso exacto.</p>
+
+              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;margin-bottom:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Inscribir partido</div>
+                <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end;">
+                  <div class="field"><label>Nombre del partido</label><input id="pcpNombre" placeholder="Ej. Gallera El Progreso"></div>
+                  <div class="field"><label>Representante</label><input id="pcpRepresentante" placeholder="Nombre del representante"></div>
+                  <div class="field"><label>WhatsApp</label><input id="pcpTelefono" placeholder="Ej. 9181234567"></div>
+                  <button class="btn btn-primary" onclick="inscribirPartidoCompromiso()">+ Inscribir partido</button>
+                </div>
               </div>
-              <div style="margin-top:16px;"><button class="btn btn-primary" onclick="crearCompromiso()">+ Armar pelea de compromiso</button></div>
+
+              <div id="partidosCompromisoCardsWrap" style="margin-bottom:20px;"></div>
+
+              <div style="border:1px solid var(--border);border-radius:5px;padding:18px;background:var(--bg-panel-3);">
+                <div class="panel-eyebrow" style="margin-bottom:10px;">Armar pelea</div>
+                <div class="form-grid">
+                  <div class="field"><label>Lado Rojo</label><select id="compRojo"></select></div>
+                  <div class="field"><label>Lado Verde</label><select id="compVerde"></select></div>
+                </div>
+                <div style="margin-top:16px;"><button class="btn btn-primary" onclick="crearCompromiso()">+ Armar pelea de compromiso</button></div>
+              </div>
             </div>
           </div>
 
@@ -1336,11 +1368,15 @@ function defaultDB(){
     casteoActivoId:null,
     casteoPartidos:[],
     pollos:[],
+    partidosRapida:[],
+    partidosCompromiso:[],
     nextId:1
   };
 }
 function normalizarDB(){
   if(!DB.usuarios || !DB.usuarios.length) DB.usuarios = defaultDB().usuarios;
+  if(!DB.partidosRapida) DB.partidosRapida = [];
+  if(!DB.partidosCompromiso) DB.partidosCompromiso = [];
   if(!DB.casteos) DB.casteos = [];
   if(!DB.casteoPartidos) DB.casteoPartidos = [];
   // migración: partidos de casteo viejos sin casteoId → se agrupan en un casteo genérico
@@ -1512,7 +1548,7 @@ function agregarGallo(){
   else toast('Gallo registrado');
   const p = DB.partidos.find(x=>x.nombre.toLowerCase()===partido.toLowerCase());
   if(p){
-    const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===partido.toLowerCase()).length;
+    const yaInscritos = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===partido.toLowerCase()).length;
     if(yaInscritos >= cfg.gallosPorPartido) toast(`${partido} ya tiene su cupo completo (${cfg.gallosPorPartido} gallos)`);
   }
   DB.gallos.push({id:newId(), partido, dueno:dueno||partido, nombre:nombre||'—', peso, anillo, color, casta, estado:'disponible'});
@@ -1564,7 +1600,7 @@ function guardarEdicionGallo(){
 function renderGallos(){
   const q = (document.getElementById('buscarGallo')?.value||'').toLowerCase();
   const wrap = document.getElementById('tablaGallosWrap');
-  let list = DB.gallos.filter(g => g.origen!=='casteo' && (!q || (g.partido+g.dueno+g.nombre+g.anillo).toLowerCase().includes(q)));
+  let list = DB.gallos.filter(g => !g.origen && (!q || (g.partido+g.dueno+g.nombre+g.anillo).toLowerCase().includes(q)));
   if(!list.length){ wrap.innerHTML = emptyState('Sin gallos registrados','Agrega el primer gallo del Derby arriba.'); return; }
   wrap.innerHTML = `<table><thead><tr>
     <th>Partido</th><th>Dueño</th><th>Nombre</th><th>Peso</th><th>Anillo</th><th>Color</th><th>Casta</th><th>Estado</th><th></th>
@@ -1718,7 +1754,7 @@ function renderDerbysPage(){
   const cupo = derby ? derby.gallosPorPartido : 4;
   if(!partidos.length){ wrap.innerHTML = emptyState('Sin partidos en este derby','Inscribe partidos para este derby desde el Cotejador.'); return; }
   wrap.innerHTML = `<div class="ticket-grid">${partidos.map(p=>{
-    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length>=cupo;
     return `<div class="panel clickable-card" style="margin-bottom:0;" onclick="abrirDetallePartido(${p.id})">
       <div class="panel-body">
@@ -1737,7 +1773,7 @@ function renderDerbysPage(){
 function abrirDetallePartido(partidoId){
   const p = DB.partidos.find(x=>x.id===partidoId);
   if(!p) return;
-  const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
+  const roster = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase());
   document.getElementById('detallePartidoTitulo').textContent = p.nombre;
   const body = document.getElementById('detallePartidoBody');
   const infoHeader = `<div class="helptext" style="margin-bottom:14px;">Representante: <b style="color:var(--text);">${p.representante}</b></div>`;
@@ -2184,7 +2220,7 @@ function guardarEdicionPartido(){
   p.representante = representante;
   p.telefono = document.getElementById('epTelefono').value.trim();
   if(nombreAnterior.toLowerCase() !== nombre.toLowerCase()){
-    DB.gallos.forEach(g=>{ if(g.origen!=='casteo' && g.partido.toLowerCase()===nombreAnterior.toLowerCase()) g.partido = nombre; });
+    DB.gallos.forEach(g=>{ if(!g.origen && g.partido.toLowerCase()===nombreAnterior.toLowerCase()) g.partido = nombre; });
     DB.excepciones.forEach(e=>{
       if(e.a.toLowerCase()===nombreAnterior.toLowerCase()) e.a = nombre;
       if(e.b.toLowerCase()===nombreAnterior.toLowerCase()) e.b = nombre;
@@ -2207,7 +2243,7 @@ function agregarGalloAPartido(partidoId){
   const color = document.getElementById('pg_color_'+partidoId).value.trim();
   if(!peso){ toast('Falta el peso del gallo'); return; }
   const cfg = derbyDeGallo(p);
-  const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
+  const yaInscritos = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
   if(cfg.pesoMin && peso < cfg.pesoMin) toast(`Aviso: ${peso}kg está por debajo del mínimo (${cfg.pesoMin}kg)`);
   else if(cfg.pesoMax && peso > cfg.pesoMax) toast(`Aviso: ${peso}kg está por encima del máximo (${cfg.pesoMax}kg)`);
   else if(yaInscritos >= cfg.gallosPorPartido) toast(`${p.nombre} ya completó su cupo de ${cfg.gallosPorPartido}`);
@@ -2224,7 +2260,7 @@ function renderPartidos(){
   if(!partidosDelDerby.length){ wrap.innerHTML = emptyState('Sin partidos inscritos','Inscribe el primer partido con su representante para empezar a darle de alta sus gallos.'); renderSorteoStatus(); return; }
   const cupo = activeDerby().gallosPorPartido || 4;
   wrap.innerHTML = partidosDelDerby.map(p=>{
-    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length >= cupo;
     const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
     return `<div class="panel" style="margin-bottom:12px;">
@@ -2267,7 +2303,7 @@ function renderPartidosGeneral(){
   wrap.innerHTML = DB.partidos.map(p=>{
     const cfg = derbyDeGallo(p);
     const cupo = cfg.gallosPorPartido || 4;
-    const roster = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase());
+    const roster = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase());
     const completo = roster.length >= cupo;
     return `<div class="panel" style="margin-bottom:12px;">
       <div class="panel-head">
@@ -2309,7 +2345,7 @@ function agregarGalloAPartidoGeneral(partidoId){
   const color = document.getElementById('pgg_color_'+partidoId).value.trim();
   if(!peso){ toast('Falta el peso del gallo'); return; }
   const cfg = derbyDeGallo(p);
-  const yaInscritos = DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
+  const yaInscritos = DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase()).length;
   if(cfg.pesoMin && peso < cfg.pesoMin) toast(`Aviso: ${peso}kg está por debajo del mínimo (${cfg.pesoMin}kg)`);
   else if(cfg.pesoMax && peso > cfg.pesoMax) toast(`Aviso: ${peso}kg está por encima del máximo (${cfg.pesoMax}kg)`);
   else if(yaInscritos >= cfg.gallosPorPartido) toast(`${p.nombre} ya completó su cupo de ${cfg.gallosPorPartido}`);
@@ -2325,7 +2361,7 @@ function renderSorteoStatus(){
   const cfg = activeDerby();
   const partidosDelDerby = DB.partidos.filter(p=>p.derbyId===DB.derbyActivoId);
   const cupo = cfg.gallosPorPartido || 4;
-  const completos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length >= cupo).length;
+  const completos = partidosDelDerby.filter(p => DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase()).length >= cupo).length;
   const disponibles = DB.gallos.filter(g=>g.estado==='disponible').length;
   el.textContent = `Derby activo: ${cfg.nombre} · ${partidosDelDerby.length} partido(s) inscrito(s) · ${completos} completo(s) · ${disponibles} gallo(s) disponibles para el sorteo · tolerancia ${cfg.tolerancia||80} g`;
 }
@@ -2350,7 +2386,7 @@ function importarPartidoCasteado(){
   }
   let importados = 0;
   pollos.forEach(pollo=>{
-    const yaExiste = DB.gallos.some(g=>g.origen!=='casteo' && g.anillo && pollo.anillo && g.anillo.toLowerCase()===pollo.anillo.toLowerCase() && g.partido.toLowerCase()===cp.nombre.toLowerCase());
+    const yaExiste = DB.gallos.some(g=>!g.origen && g.anillo && pollo.anillo && g.anillo.toLowerCase()===pollo.anillo.toLowerCase() && g.partido.toLowerCase()===cp.nombre.toLowerCase());
     if(yaExiste) return;
     DB.gallos.push({id:newId(), partido:cp.nombre, dueno:cp.representante, nombre:pollo.nombre, peso:pollo.peso||0, anillo:pollo.anillo, color:pollo.color, casta:pollo.casta, estado:'disponible'});
     importados++;
@@ -2368,7 +2404,7 @@ function cotejarAutomatico(tipo){
     const cupo = cfg.gallosPorPartido || 4;
     const partidosDelDerby = DB.partidos.filter(p=>p.derbyId===DB.derbyActivoId);
     if(!partidosDelDerby.length){ toast('Primero inscribe partidos en este derby'); return; }
-    const incompletos = partidosDelDerby.filter(p => DB.gallos.filter(g=>g.origen!=='casteo' && g.partido.toLowerCase()===p.nombre.toLowerCase()).length < cupo);
+    const incompletos = partidosDelDerby.filter(p => DB.gallos.filter(g=>!g.origen && g.partido.toLowerCase()===p.nombre.toLowerCase()).length < cupo);
     if(incompletos.length){ toast(`Faltan gallos por registrar en: ${incompletos.map(p=>p.nombre).join(', ')}`); return; }
   }
   if(tipo==='casteo' && !DB.casteoActivoId){ toast('Primero crea y activa un casteo'); return; }
@@ -2378,7 +2414,8 @@ function cotejarAutomatico(tipo){
   let disponibles = DB.gallos.filter(g=>{
     if(g.estado!=='disponible') return false;
     if(tipo==='casteo') return g.origen==='casteo' && g.casteoId===DB.casteoActivoId;
-    return g.origen!=='casteo';
+    if(tipo==='rapida') return g.origen==='rapida';
+    return !g.origen; // derby
   }).sort((a,b)=>a.peso-b.peso);
   let armados = 0;
   let usados = new Set();
@@ -2410,7 +2447,7 @@ function cotejarAutomatico(tipo){
   renderAll();
 }
 function fillCompromisoSelects(){
-  const disp = DB.gallos.filter(g=>g.estado==='disponible' && g.origen!=='casteo');
+  const disp = DB.gallos.filter(g=>g.estado==='disponible' && g.origen==='compromiso');
   const opts = '<option value="">— selecciona —</option>' + disp.map(g=>`<option value="${g.id}">${g.nombre} · ${g.partido} · ${g.peso.toFixed(2)}kg</option>`).join('');
   document.getElementById('compRojo').innerHTML = opts;
   document.getElementById('compVerde').innerHTML = opts;
@@ -2431,6 +2468,147 @@ function crearCompromiso(){
 }
 function deshacerPelea(id){
   const c = DB.peleas.find(x=>x.id===id);
+
+/* ===================== PARTIDOS DE PELEAS RÁPIDAS ===================== */
+function inscribirPartidoRapida(){
+  const nombre = document.getElementById('prNombre').value.trim();
+  const representante = document.getElementById('prRepresentante').value.trim();
+  const telefono = document.getElementById('prTelefono').value.trim();
+  if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
+  if(DB.partidosRapida.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase())){ toast('Ese partido ya está inscrito en Rápidas'); return; }
+  DB.partidosRapida.push({id:newId(), nombre, representante, telefono});
+  saveDB();
+  ['prNombre','prRepresentante','prTelefono'].forEach(id=>document.getElementById(id).value='');
+  toast('Partido inscrito en Rápidas');
+  renderAll();
+}
+function borrarPartidoRapida(id){
+  confirmarAccion('¿Quitar este partido de Rápidas? También se quitan sus gallos.', ()=>{
+    DB.gallos = DB.gallos.filter(g=>!(g.origen==='rapida' && g.partidoRapidaId===id));
+    DB.partidosRapida = DB.partidosRapida.filter(p=>p.id!==id);
+    saveDB(); renderAll();
+    toast('Partido eliminado');
+  });
+}
+function agregarGalloRapida(partidoRapidaId){
+  const p = DB.partidosRapida.find(x=>x.id===partidoRapidaId);
+  if(!p) return;
+  const nombre = document.getElementById('pr_nombre_'+partidoRapidaId).value.trim();
+  const peso = parseFloat(document.getElementById('pr_peso_'+partidoRapidaId).value);
+  const anillo = document.getElementById('pr_anillo_'+partidoRapidaId).value.trim();
+  const color = document.getElementById('pr_color_'+partidoRapidaId).value.trim();
+  if(!peso){ toast('Falta el peso del gallo'); return; }
+  DB.gallos.push({id:newId(), origen:'rapida', partidoRapidaId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', peso, anillo, color, casta:'', estado:'disponible'});
+  saveDB();
+  toast('Gallo agregado a '+p.nombre);
+  renderAll();
+}
+function renderPartidosRapidaCards(){
+  const wrap = document.getElementById('partidosRapidaCardsWrap');
+  if(!wrap) return;
+  if(!DB.partidosRapida.length){ wrap.innerHTML = emptyState('Sin partidos en Rápidas','Inscribe el primer partido arriba.'); return; }
+  const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
+  wrap.innerHTML = DB.partidosRapida.map(p=>{
+    const roster = DB.gallos.filter(g=>g.origen==='rapida' && g.partidoRapidaId===p.id);
+    return `<div class="panel" style="margin-bottom:12px;">
+      <div class="panel-head">
+        <div><span class="panel-eyebrow">Rep. ${p.representante}</span><h2 style="font-size:19px;">${p.nombre}</h2></div>
+        <div class="panel-actions">
+          <span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>${roster.length} gallo${roster.length===1?'':'s'}</span>
+          <button class="icon-btn" onclick="borrarPartidoRapida(${p.id})" title="Quitar partido">✕</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:8px;">
+          <input id="pr_nombre_${p.id}" placeholder="Nombre del gallo" style="${inputStyle}">
+          <input id="pr_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg" style="${inputStyle}">
+          <input id="pr_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
+          <input id="pr_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <button class="btn btn-primary btn-sm" onclick="agregarGalloRapida(${p.id})">+ Agregar</button>
+        </div>
+        ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
+            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span></span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
+              <button class="icon-btn" onclick="borrarGallo(${g.id})" title="Quitar gallo">✕</button>
+            </span>
+          </div>`).join('')}</div>` : `<div class="helptext">Aún sin gallos en este partido.</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ===================== PARTIDOS DE PELEAS DE COMPROMISO ===================== */
+function inscribirPartidoCompromiso(){
+  const nombre = document.getElementById('pcpNombre').value.trim();
+  const representante = document.getElementById('pcpRepresentante').value.trim();
+  const telefono = document.getElementById('pcpTelefono').value.trim();
+  if(!nombre || !representante){ toast('Falta el nombre del partido o el representante'); return; }
+  if(DB.partidosCompromiso.some(p=>p.nombre.toLowerCase()===nombre.toLowerCase())){ toast('Ese partido ya está inscrito en Compromiso'); return; }
+  DB.partidosCompromiso.push({id:newId(), nombre, representante, telefono});
+  saveDB();
+  ['pcpNombre','pcpRepresentante','pcpTelefono'].forEach(id=>document.getElementById(id).value='');
+  toast('Partido inscrito en Compromiso');
+  renderAll();
+}
+function borrarPartidoCompromiso(id){
+  confirmarAccion('¿Quitar este partido de Compromiso? También se quitan sus gallos.', ()=>{
+    DB.gallos = DB.gallos.filter(g=>!(g.origen==='compromiso' && g.partidoCompromisoId===id));
+    DB.partidosCompromiso = DB.partidosCompromiso.filter(p=>p.id!==id);
+    saveDB(); renderAll();
+    toast('Partido eliminado');
+  });
+}
+function agregarGalloCompromiso(partidoCompromisoId){
+  const p = DB.partidosCompromiso.find(x=>x.id===partidoCompromisoId);
+  if(!p) return;
+  const nombre = document.getElementById('pcp_nombre_'+partidoCompromisoId).value.trim();
+  const peso = parseFloat(document.getElementById('pcp_peso_'+partidoCompromisoId).value);
+  const anillo = document.getElementById('pcp_anillo_'+partidoCompromisoId).value.trim();
+  const color = document.getElementById('pcp_color_'+partidoCompromisoId).value.trim();
+  if(!peso){ toast('Falta el peso del gallo'); return; }
+  if(peso < 1.9 || peso > 2.8) toast(`Aviso: ${peso}kg está fuera del rango típico de compromiso (1.9–2.8 kg)`);
+  else toast('Gallo agregado a '+p.nombre);
+  DB.gallos.push({id:newId(), origen:'compromiso', partidoCompromisoId, partido:p.nombre, dueno:p.representante, nombre:nombre||'—', peso, anillo, color, casta:'', estado:'disponible'});
+  saveDB();
+  renderAll();
+}
+function renderPartidosCompromisoCards(){
+  const wrap = document.getElementById('partidosCompromisoCardsWrap');
+  if(!wrap) return;
+  if(!DB.partidosCompromiso.length){ wrap.innerHTML = emptyState('Sin partidos en Compromiso','Inscribe el primer partido arriba.'); return; }
+  const inputStyle = 'padding:9px 10px;background:var(--bg-panel-2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-size:12.5px;width:100%;';
+  wrap.innerHTML = DB.partidosCompromiso.map(p=>{
+    const roster = DB.gallos.filter(g=>g.origen==='compromiso' && g.partidoCompromisoId===p.id);
+    return `<div class="panel" style="margin-bottom:12px;">
+      <div class="panel-head">
+        <div><span class="panel-eyebrow">Rep. ${p.representante}</span><h2 style="font-size:19px;">${p.nombre}</h2></div>
+        <div class="panel-actions">
+          <span class="badge badge-ok"><span class="dot" style="background:var(--verde)"></span>${roster.length} gallo${roster.length===1?'':'s'}</span>
+          <button class="icon-btn" onclick="borrarPartidoCompromiso(${p.id})" title="Quitar partido">✕</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="form-grid" style="grid-template-columns:1.2fr 1fr 1fr 1fr auto;gap:8px;">
+          <input id="pcp_nombre_${p.id}" placeholder="Nombre del gallo" style="${inputStyle}">
+          <input id="pcp_peso_${p.id}" type="number" step="0.01" placeholder="Peso kg (1.9–2.8)" style="${inputStyle}">
+          <input id="pcp_anillo_${p.id}" placeholder="Anillo" style="${inputStyle}">
+          <input id="pcp_color_${p.id}" placeholder="Color" style="${inputStyle}">
+          <button class="btn btn-primary btn-sm" onclick="agregarGalloCompromiso(${p.id})">+ Agregar</button>
+        </div>
+        ${roster.length ? `<div style="margin-top:12px;">${roster.map(g=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border-soft);font-size:12.5px;">
+            <span>${g.nombre} <span style="color:var(--text-muted);">— ${g.peso.toFixed(2)}kg${g.anillo?' · #'+g.anillo:''}${g.color?' · '+g.color:''}</span></span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              ${g.estado==='disponible'?'<span class="badge badge-pend">Sin cotejar</span>':g.estado==='cotejado'?'<span class="badge badge-ok">Cotejado</span>':'<span class="badge badge-off">Peleado</span>'}
+              <button class="icon-btn" onclick="borrarGallo(${g.id})" title="Quitar gallo">✕</button>
+            </span>
+          </div>`).join('')}</div>` : `<div class="helptext">Aún sin gallos en este partido.</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
   if(!c) return;
   [c.rojo,c.verde].forEach(gid=>{ const g=DB.gallos.find(x=>x.id===gid); if(g) g.estado='disponible'; });
   DB.peleas = DB.peleas.filter(x=>x.id!==id);
@@ -3085,10 +3263,10 @@ function exportarExcel(){
 
 /* ===================== DASHBOARD ===================== */
 function renderDashboard(){
-  document.getElementById('statGallos').innerHTML = DB.gallos.filter(g=>g.origen!=='casteo').length;
+  document.getElementById('statGallos').innerHTML = DB.gallos.filter(g=>!g.origen).length;
   document.getElementById('statCotejos').innerHTML = DB.peleas.length;
   document.getElementById('statCerradas').innerHTML = DB.peleas.filter(c=>c.estado==='finalizado').length;
-  document.getElementById('statSueltos').innerHTML = DB.gallos.filter(g=>g.estado==='disponible' && g.origen!=='casteo').length;
+  document.getElementById('statSueltos').innerHTML = DB.gallos.filter(g=>g.estado==='disponible' && !g.origen).length;
   document.getElementById('chipDerby').textContent = DB.peleas.filter(c=>c.tipo==='derby').length;
   document.getElementById('chipRapida').textContent = DB.peleas.filter(c=>c.tipo==='rapida').length;
   document.getElementById('chipCompromiso').textContent = DB.peleas.filter(c=>c.tipo==='compromiso').length;
